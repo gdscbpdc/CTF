@@ -2,20 +2,50 @@
 @tailwind components;
 @tailwind utilities;
 
+/* @import '/public/fonts/fonts.css'; */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --white-color: #ffffff !important;
+  --green-color: #9fef00 !important;
+  --gray-color: #a4b1cd !important;
+  --red-color: #ff3e3e !important;
+  --yellow-color: #ffaf00 !important;
+
+  --background-root: #141d2b !important;
+  --background-navbar: #101927 !important;
+  --background-container: #1a2332 !important;
+  --background-green: #9fef0012 !important;
+  --background-green-hover: #aaff0025 !important;
+  --background-red: #2f1e2a !important;
+  --background-red-hover: #41222c !important;
+  --background-yellow: #ffaf001a !important;
+
+  --border-color: #202837 !important;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+}
+
+* ::-webkit-scrollbar {
+  scrollbar-width: none;
+  scroll-behavior: smooth;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  line-height: 1.5;
+  text-wrap: balance;
+  background: var(--background-root);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: 'NeueHaasUnica', Roboto, sans-serif;
+}
+
+.code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
 }
