@@ -2,17 +2,14 @@
 
 import { NextUIProvider } from '@nextui-org/react';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
+import { AuthProvider } from '@/contexts/AuthContext';
 
 export function Providers({ children }) {
   return (
-    <NextUIProvider>
-      <NextThemesProvider
-        attribute='class'
-        defaultTheme='dark'
-        themes={['dark', 'light']}
-      >
-        {children}
-      </NextThemesProvider>
-    </NextUIProvider>
+    <NextThemesProvider attribute='class' defaultTheme='system' enableSystem>
+      <NextUIProvider>
+        <AuthProvider>{children}</AuthProvider>
+      </NextUIProvider>
+    </NextThemesProvider>
   );
 }

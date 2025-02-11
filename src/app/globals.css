@@ -5,14 +5,11 @@
 /* @import '/public/fonts/fonts.css'; */
 
 :root {
-  --white-color: #ffffff !important;
+  --foreground: #ffffff !important;
+  --background: #141d2b !important;
   --green-color: #9fef00 !important;
-  --gray-color: #a4b1cd !important;
-  --red-color: #ff3e3e !important;
-  --yellow-color: #ffaf00 !important;
 
-  --background-root: #141d2b !important;
-  --background-navbar: #101927 !important;
+  --background-secondary: #111927 !important;
   --background-container: #1a2332 !important;
   --background-green: #9fef0012 !important;
   --background-green-hover: #aaff0025 !important;
@@ -20,7 +17,13 @@
   --background-red-hover: #41222c !important;
   --background-yellow: #ffaf001a !important;
 
-  --border-color: #202837 !important;
+  --gray-color: #a4b1cd !important;
+
+  --content1: #1a2332 !important;
+  --overlay: #1a2332 !important;
+  --divider: #202837 !important;
+  --warning: #ffaf00 !important;
+  --error: #ff3e3e !important;
 }
 
 * {
@@ -48,4 +51,65 @@ body {
 .code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+.full-description {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+}
+
+.full-description h3 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.full-description h4 {
+  font-size: 1.25em;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.full-description h5 {
+  font-size: 1.125em;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.full-description p {
+  font-size: 1em;
+  margin-bottom: 15px;
+}
+
+.full-description code {
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 1em;
+}
+
+.full-description pre {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 1em;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.full-description ul,
+.full-description ol {
+  padding-left: 20px;
+  margin-bottom: 10px;
+}
+
+.full-description li {
+  margin-bottom: 5px;
+}
+
+.full-description a {
+  text-decoration: none;
+}
+
+.full-description a:hover {
+  text-decoration: underline;
 }

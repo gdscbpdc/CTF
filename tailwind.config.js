@@ -8,24 +8,41 @@ module.exports = {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
     './node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}',
   ],
-  theme: {
-    extend: {},
-  },
   darkMode: 'class',
   plugins: [
     nextui({
       themes: {
+        light: {
+          colors: {
+            primary: {
+              DEFAULT: '#9fef00',
+              foreground: '#ffffff',
+            },
+            danger: {
+              DEFAULT: '#ff3e3e',
+            },
+            success: {
+              DEFAULT: '#9fef00',
+            },
+            warning: {
+              DEFAULT: '#ffaf00',
+            },
+          },
+        },
         dark: {
           colors: {
-            background: '#0A0A0A',
-            foreground: '#FFFFFF',
             primary: {
-              DEFAULT: '#10B981',
+              DEFAULT: '#9fef00',
               foreground: '#000000',
             },
-            secondary: {
-              DEFAULT: '#6366F1',
-              foreground: '#FFFFFF',
+            danger: {
+              DEFAULT: '#ff3e3e',
+            },
+            success: {
+              DEFAULT: '#9fef00',
+            },
+            warning: {
+              DEFAULT: '#ffaf00',
             },
           },
         },
