@@ -31,9 +31,7 @@ export default function HomePage() {
         />
 
         <section className='text-center space-y-6'>
-          <h1 className='text-5xl font-bold bg-gradient-to-r from-primary to-danger bg-clip-text text-transparent'>
-            GDG CTF Platform
-          </h1>
+          <h1 className='text-5xl font-bold text-primary'>GDG CTF Platform</h1>
           <p className='text-xl text-foreground-600 max-w-2xl mx-auto'>
             Test your hacking skills, solve challenges, and compete with teams
             from around the world in our Capture The Flag competition.
@@ -111,7 +109,7 @@ export default function HomePage() {
           </Card>
         </section>
 
-        <section className='text-center space-y-6 bg-gradient-to-r from-primary/20 to-danger/20 rounded-xl p-12'>
+        <section className='text-center space-y-6 bg-gradient-to-r from-primary/80 via-background/80 to-primary/80 rounded-xl p-12'>
           <h2 className='text-3xl font-bold'>Ready to Test Your Skills?</h2>
           <p className='text-xl text-foreground-600'>
             Join hundreds of cybersecurity enthusiasts in our CTF competition.
@@ -131,7 +129,7 @@ export default function HomePage() {
   } else
     return (
       <div className='space-y-8 overflow-visible'>
-        <section className='text-center bg-gradient-to-r from-success/80 to-danger/80 rounded-xl p-12'>
+        <section className='text-center bg-gradient-to-r from-background/80 via-primary/80 to-background/80 rounded-xl p-12'>
           <h1 className='text-4xl font-bold text-white mb-4'>
             Welcome back, {user.name}!
           </h1>
