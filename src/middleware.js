@@ -67,7 +67,7 @@ export async function middleware(request) {
       return NextResponse.next();
     }
 
-    if (!hasEventStarted()) {
+    if (hasEventStarted()) {
       if (!isPublicRoute) {
         return NextResponse.redirect(new URL('/countdown', request.url));
       }
