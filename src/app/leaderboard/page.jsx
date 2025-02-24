@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import {
   Card,
   CardBody,
@@ -15,9 +14,11 @@ import {
   Chip,
 } from '@nextui-org/react';
 import { Trophy } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+
 import { getLeaderboard } from '@/lib/leaderboard';
-import LoadingState from '@/components/ui/LoadingState';
 import ErrorState from '@/components/ui/ErrorState';
+import LoadingState from '@/components/ui/LoadingState';
 
 export default function LeaderboardPage() {
   const [leaderboard, setLeaderboard] = useState(null);
@@ -43,7 +44,8 @@ export default function LeaderboardPage() {
     loadLeaderboard();
   }, [loadLeaderboard]);
 
-  if (isLoading) return <LoadingState message='Loading leaderboard...' />;
+  if (isLoading)
+    return <LoadingState message='Loading leaderboard...' fullHeight />;
   if (error) return <ErrorState message={error} onRetry={loadLeaderboard} />;
   if (!leaderboard?.teams?.length)
     return <ErrorState message='No teams found' />;

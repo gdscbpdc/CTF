@@ -1,23 +1,35 @@
 'use client';
 
+import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button, Card } from '@nextui-org/react';
 import { Flag, Trophy, Users, ChevronRight } from 'lucide-react';
-import Link from 'next/link';
-import ChallengeGrid from '@/components/challenges/ChallengeGrid';
+
+import LoadingState from '@/components/ui/LoadingState';
 import RecentSolves from '@/components/home/RecentSolves';
+import ChallengeGrid from '@/components/challenges/ChallengeGrid';
 import LeaderboardPreview from '@/components/home/LeaderboardPreview';
 
 export default function HomePage() {
   const { user, loading } = useAuth();
 
-  if (loading) {
-    return null;
-  }
+  if (loading)
+    return <LoadingState message='Loading user data...' fullHeight />;
 
   if (!user) {
     return (
       <div className='space-y-16'>
+        <iframe
+          width='100%'
+          height='100%'
+          frameborder='0'
+          allowfullscreen
+          className='size-full aspect-video'
+          referrerpolicy='strict-origin-when-cross-origin'
+          src='https://www.youtube.com/embed/xMJRmFuUP_4?autoplay=1&loop=1&controls=0'
+          title='RIFT | The Ultimate Battleground | Inter-University CTF | Powered by GDGoC BITS Pilani Dubai'
+        />
+
         <section className='text-center space-y-6'>
           <h1 className='text-5xl font-bold bg-gradient-to-r from-primary to-danger bg-clip-text text-transparent'>
             GDG CTF Platform
@@ -119,7 +131,7 @@ export default function HomePage() {
   } else
     return (
       <div className='space-y-8 overflow-visible'>
-        <section className='text-center bg-gradient-to-r from-primary/70 to-danger/70 rounded-xl p-12'>
+        <section className='text-center bg-gradient-to-r from-success/80 to-danger/80 rounded-xl p-12'>
           <h1 className='text-4xl font-bold text-white mb-4'>
             Welcome back, {user.name}!
           </h1>

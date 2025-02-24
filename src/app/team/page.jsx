@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import {
   Card,
   CardBody,
@@ -25,12 +24,14 @@ import {
   Target,
   Clock,
 } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { getTeamProgress, getTeamActivity, getTeamDetails } from '@/lib/teams';
+import { useEffect, useState } from 'react';
+
 import { getTeamRank } from '@/lib/leaderboard';
+import { useAuth } from '@/contexts/AuthContext';
 import TeamChat from '@/components/chat/TeamChat';
-import LoadingState from '@/components/ui/LoadingState';
 import ErrorState from '@/components/ui/ErrorState';
+import LoadingState from '@/components/ui/LoadingState';
+import { getTeamProgress, getTeamActivity, getTeamDetails } from '@/lib/teams';
 
 export default function TeamPage() {
   const { user } = useAuth();
@@ -69,7 +70,8 @@ export default function TeamPage() {
     }
   };
 
-  if (isLoading) return <LoadingState message='Loading team data...' />;
+  if (isLoading)
+    return <LoadingState message='Loading team data...' fullHeight />;
   if (error) return <ErrorState message={error} onRetry={loadTeamData} />;
 
   if (!user?.team) {

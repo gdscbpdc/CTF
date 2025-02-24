@@ -1,10 +1,11 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
-import { auth } from '@/services/firebase.config';
-import { onAuthStateChanged } from 'firebase/auth';
-import { getCurrentUser } from '@/lib/auth';
 import Cookies from 'js-cookie';
+import { onAuthStateChanged } from 'firebase/auth';
+import { createContext, useContext, useEffect, useState } from 'react';
+
+import { getCurrentUser } from '@/lib/auth';
+import { auth } from '@/services/firebase.config';
 import LoadingState from '@/components/ui/LoadingState';
 
 const AuthContext = createContext({});
@@ -46,9 +47,7 @@ export function AuthProvider({ children }) {
   return (
     <AuthContext.Provider value={{ user, loading }}>
       {loading ? (
-        <div className='h-dvh min-h-dvh w-dvw flex flex-col items-center justify-center bg-default-900 bg-opacity-90 z-50'>
-          <LoadingState message='' />
-        </div>
+        <LoadingState message='Loading user data...' fullHeight />
       ) : (
         children
       )}

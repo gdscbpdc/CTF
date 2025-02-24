@@ -31,9 +31,15 @@ module.exports = {
         },
         dark: {
           colors: {
+            background: {
+              DEFAULT: '#080305',
+            },
+            foreground: {
+              DEFAULT: '#f3f3f3',
+            },
             primary: {
-              DEFAULT: '#9fef00',
-              foreground: '#000000',
+              DEFAULT: '#A90200',
+              foreground: '#f3f3f3',
             },
             danger: {
               DEFAULT: '#ff3e3e',

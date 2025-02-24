@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import {
   Table,
   TableHeader,
@@ -16,9 +15,12 @@ import {
 } from '@nextui-org/react';
 import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
-import { db } from '@/services/firebase.config';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { collection, query, onSnapshot } from 'firebase/firestore';
+
+import LoadingState from '../ui/LoadingState';
+import { db } from '@/services/firebase.config';
+import { useAuth } from '@/contexts/AuthContext';
 
 const CHALLENGE_CATEGORIES = [
   'Web',
@@ -45,20 +47,20 @@ const columns = [
 export default function ChallengeTable() {
   const router = useRouter();
   const { user } = useAuth();
-  const [page, setPage] = React.useState(1);
-  const [challenges, setChallenges] = React.useState([]);
-  const [filterValue, setFilterValue] = React.useState('');
-  const [selectedCategory, setSelectedCategory] = React.useState('all');
-  const [selectedDifficulty, setSelectedDifficulty] = React.useState('all');
-  const [showSolved, setShowSolved] = React.useState('all');
-  const [isLoading, setIsLoading] = React.useState(true);
+  const [page, setPage] = useState(1);
+  const [challenges, setChallenges] = useState([]);
+  const [filterValue, setFilterValue] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedDifficulty, setSelectedDifficulty] = useState('all');
+  const [showSolved, setShowSolved] = useState('all');
+  const [isLoading, setIsLoading] = useState(true);
   const ROWS_PER_PAGE = 10;
-  const [sortDescriptor, setSortDescriptor] = React.useState({
+  const [sortDescriptor, setSortDescriptor] = useState({
     column: 'title',
     direction: 'ascending',
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     const unsubscribe = subscribeToChanges();
     return () => unsubscribe?.();
   }, []);
@@ -89,7 +91,7 @@ export default function ChallengeTable() {
 
   const hasSearchFilter = Boolean(filterValue);
 
-  const filteredItems = React.useMemo(() => {
+  const filteredItems = useMemo(() => {
     let filteredChallenges = [...challenges];
 
     if (hasSearchFilter) {
@@ -135,14 +137,14 @@ export default function ChallengeTable() {
 
   const pages = Math.ceil(filteredItems.length / ROWS_PER_PAGE);
 
-  const items = React.useMemo(() => {
+  const items = useMemo(() => {
     const start = (page - 1) * ROWS_PER_PAGE;
     const end = start + ROWS_PER_PAGE;
 
     return filteredItems.slice(start, end);
   }, [page, filteredItems]);
 
-  const sortedItems = React.useMemo(() => {
+  const sortedItems = useMemo(() => {
     return [...items].sort((a, b) => {
       const first = a[sortDescriptor.column];
       const second = b[sortDescriptor.column];
@@ -152,7 +154,7 @@ export default function ChallengeTable() {
     });
   }, [sortDescriptor, items]);
 
-  const renderCell = React.useCallback(
+  const renderCell = useCallback(
     (challenge, columnKey) => {
       const cellValue = challenge[columnKey];
 
@@ -210,7 +212,7 @@ export default function ChallengeTable() {
     [user?.team]
   );
 
-  const onSearchChange = React.useCallback((value) => {
+  const onSearchChange = useCallback((value) => {
     if (value) {
       setFilterValue(value);
       setPage(1);
@@ -219,7 +221,7 @@ export default function ChallengeTable() {
     }
   }, []);
 
-  const topContent = React.useMemo(() => {
+  const topContent = useMemo(() => {
     return (
       <div className='flex flex-col gap-4'>
         <div className='flex flex-wrap flex-col sm:flex-row justify-start gap-3'>
@@ -306,15 +308,15 @@ export default function ChallengeTable() {
     user?.team,
   ]);
 
-  const bottomContent = React.useMemo(() => {
+  const bottomContent = useMemo(() => {
     return (
       <div className='py-2 px-2 flex justify-center items-center'>
         <Pagination
           showControls
           classNames={{
-            cursor: 'bg-primary text-background',
+            cursor: 'bg-primary text-foreground',
           }}
-          color='default'
+          color='primary'
           page={page}
           total={pages}
           variant='light'
@@ -323,6 +325,9 @@ export default function ChallengeTable() {
       </div>
     );
   }, [page, pages]);
+
+  if (isLoading)
+    return <LoadingState message='Loading challenges...' fullHeight />;
 
   return (
     <Table
@@ -350,11 +355,7 @@ export default function ChallengeTable() {
           </TableColumn>
         )}
       </TableHeader>
-      <TableBody
-        emptyContent={'No challenges found'}
-        items={sortedItems}
-        isLoading={isLoading}
-      >
+      <TableBody emptyContent={'No challenges found'} items={sortedItems}>
         {(item) => (
           <TableRow key={item.id} className='cursor-pointer'>
             {(columnKey) => (

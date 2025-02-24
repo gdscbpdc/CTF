@@ -120,7 +120,7 @@ export default function TeamChat() {
                 <div
                   className={`px-4 py-2 rounded-lg max-w-[70%] ${
                     msg.userId === user.id
-                      ? 'bg-primary text-primary-foreground'
+                      ? 'bg-primary text-foreground'
                       : 'bg-default-100'
                   }`}
                 >
@@ -145,13 +145,12 @@ export default function TeamChat() {
               <Button
                 isIconOnly
                 color='primary'
-                variant='flat'
                 size='sm'
                 onPress={handleSend}
                 isLoading={isLoading}
                 isDisabled={!message.trim()}
               >
-                <Send className='w-4 h-4' />
+                <Send className='w-4 h-4 text-foreground' />
               </Button>
             }
           />

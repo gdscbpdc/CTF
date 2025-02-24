@@ -1,16 +1,15 @@
 import { NextResponse } from 'next/server';
 
-const publicRoutes = ['/', '/login', '/register', '/admin/login'];
+const EVENT_START_TIME = '2025-03-05T11:00:00+04:00';
 
-const adminRoutes = ['/admin'];
-
-const protectedRoutes = [
-  '/challenges',
-  '/team',
-  '/profile',
-  '/settings',
-  '/leaderboard',
+const publicRoutes = [
+  '/login',
+  '/register',
+  '/admin/login',
+  '/forgot-password',
 ];
+const adminRoutes = ['/admin'];
+const protectedRoutes = ['/challenges', '/team', '/profile', '/settings'];
 
 const matchesRoute = (path, patterns) => {
   return patterns.some((pattern) => {
@@ -25,6 +24,12 @@ const matchesRoute = (path, patterns) => {
   });
 };
 
+const hasEventStarted = () => {
+  const eventTime = new Date(EVENT_START_TIME).getTime();
+  const now = new Date().getTime();
+  return now >= eventTime;
+};
+
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
 
@@ -33,10 +38,10 @@ export async function middleware(request) {
 
   const isAdminRoute = matchesRoute(pathname, adminRoutes);
   const isAdminLoginRoute = pathname === '/admin/login';
-
   const isProtectedRoute = matchesRoute(pathname, protectedRoutes);
-
   const isPublicRoute = matchesRoute(pathname, publicRoutes);
+  const isHomePage = pathname === '/';
+  const isCountdownPage = pathname === '/countdown';
 
   if (isAdminRoute) {
     if (isAdminLoginRoute) {
@@ -57,15 +62,26 @@ export async function middleware(request) {
     return NextResponse.next();
   }
 
-  if (isProtectedRoute) {
-    if (!authToken) {
-      return NextResponse.redirect(new URL('/login', request.url));
+  if (authToken) {
+    if (isCountdownPage) {
+      return NextResponse.next();
     }
-    return NextResponse.next();
+
+    if (!hasEventStarted()) {
+      if (!isPublicRoute) {
+        return NextResponse.redirect(new URL('/countdown', request.url));
+      }
+    } else {
+      if (isPublicRoute || isHomePage) {
+        return NextResponse.redirect(new URL('/challenges', request.url));
+      }
+    }
   }
 
-  if (isPublicRoute && authToken && pathname !== '/') {
-    return NextResponse.redirect(new URL('/challenges', request.url));
+  if (!authToken) {
+    if (isProtectedRoute || isCountdownPage) {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
   }
 
   return NextResponse.next();

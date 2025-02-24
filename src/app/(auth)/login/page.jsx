@@ -17,7 +17,7 @@ import {
 import { loginUser, sendPasswordReset } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Mail, Lock, ArrowRight } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -32,6 +32,7 @@ export default function LoginPage() {
   const [resetSuccess, setResetSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   const handleLogin = async () => {
     try {
@@ -79,7 +80,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className='flex justify-center items-center absolute top-0 left-0 w-full h-full px-4 py-4'>
+    <div className='flex justify-center items-center absolute top-0 left-0 w-full h-full'>
       <div className='w-full max-w-md space-y-8'>
         <h1 className='text-4xl font-bold text-center bg-gradient-to-r from-primary to-danger bg-clip-text text-transparent'>
           Welcome Back
@@ -109,7 +110,16 @@ export default function LoginPage() {
             />
             <Input
               label='Password'
-              type='password'
+              type={isVisible ? 'text' : 'password'}
+              endContent={
+                <button type='button' onClick={() => setIsVisible(!isVisible)}>
+                  {isVisible ? (
+                    <Eye className='size-full text-default-400' />
+                  ) : (
+                    <EyeOff className='size-full text-default-400' />
+                  )}
+                </button>
+              }
               value={credentials.password}
               onChange={(e) =>
                 setCredentials({

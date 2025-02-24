@@ -101,7 +101,8 @@ export default function ProfilePage() {
     }
   };
 
-  if (isLoading) return <LoadingState message='Loading profile...' />;
+  if (isLoading)
+    return <LoadingState message='Loading profile...' fullHeight />;
   if (error)
     return <ErrorState message={error} onRetry={loadProfileAndStats} />;
 

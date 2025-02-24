@@ -125,7 +125,8 @@ export default function AdminDashboard() {
     });
   };
 
-  if (isLoading) return <LoadingState message='Loading dashboard...' />;
+  if (isLoading)
+    return <LoadingState message='Loading dashboard...' fullHeight />;
   if (error) return <ErrorState message={error} onRetry={loadDashboardData} />;
 
   return (

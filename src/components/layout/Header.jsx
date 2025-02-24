@@ -15,14 +15,14 @@ import {
   DropdownMenu,
   DropdownItem,
 } from '@nextui-org/react';
-import { useAuth } from '@/contexts/AuthContext';
-import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { logoutUser } from '@/lib/auth';
-import { useState } from 'react';
 import Cookies from 'js-cookie';
-import ThemeToggle from '@/components/ui/ThemeToggle';
+import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { Trophy, Flag, Users, LogOut, User, Home, Shield } from 'lucide-react';
+
+import { logoutUser } from '@/lib/auth';
+import { useAuth } from '@/contexts/AuthContext';
 
 const navItems = [
   {
@@ -34,6 +34,7 @@ const navItems = [
     label: 'Challenges',
     href: '/challenges',
     icon: Flag,
+    requiresTeam: true,
   },
   {
     label: 'Leaderboard',
@@ -77,11 +78,7 @@ export default function Header() {
       className='mb-6'
       maxWidth='full'
     >
-      <NavbarContent className='sm:hidden' justify='start'>
-        <NavbarMenuToggle />
-      </NavbarContent>
-
-      <NavbarContent className='sm:hidden pr-3' justify='center'>
+      <NavbarContent className='sm:hidden pr-3' justify='start'>
         <NavbarBrand>
           <p className='font-bold text-inherit'>
             {isAdminPage ? 'GDG CTF Admin' : 'GDG CTF'}
@@ -97,7 +94,7 @@ export default function Header() {
         </NavbarBrand>
       </NavbarContent>
 
-      <NavbarContent className='hidden sm:flex' justify='center'>
+      <NavbarContent className='hidden sm:flex space-x-5' justify='center'>
         {!isAdminPage &&
           navItems.map((item) => {
             if (item.requiresTeam && !user?.team) return null;
@@ -125,9 +122,9 @@ export default function Header() {
       </NavbarContent>
 
       <NavbarContent justify='end'>
-        <NavbarItem>
+        {/* <NavbarItem>
           <ThemeToggle />
-        </NavbarItem>
+        </NavbarItem> */}
 
         {isAdminPage ? (
           pathname === '/admin/login' ? (
@@ -154,7 +151,7 @@ export default function Header() {
               <DropdownTrigger>
                 <Avatar
                   as='button'
-                  name={user.name}
+                  name={user.name[0]}
                   className='transition-transform'
                 />
               </DropdownTrigger>
@@ -201,6 +198,10 @@ export default function Header() {
         )}
       </NavbarContent>
 
+      <NavbarContent className='sm:hidden' justify='end'>
+        <NavbarMenuToggle />
+      </NavbarContent>
+
       <NavbarMenu>
         {!isAdminPage &&
           navItems.map((item) => {
@@ -222,17 +223,19 @@ export default function Header() {
               </NavbarMenuItem>
             );
           })}
+
         {!user && !isAdminPage && (
           <>
             <NavbarMenuItem>
-              <Link className='text-foreground-500 w-full' href='/login'>
+              <Button fullWidth as={Link} href='/login' variant='flat'>
                 Login
-              </Link>
+              </Button>
             </NavbarMenuItem>
+
             <NavbarMenuItem>
-              <Link className='text-primary w-full' href='/register'>
+              <Button fullWidth as={Link} href='/register' color='primary'>
                 Register
-              </Link>
+              </Button>
             </NavbarMenuItem>
           </>
         )}

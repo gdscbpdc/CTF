@@ -1,8 +1,16 @@
-import { Spinner } from '@nextui-org/react';
+import { cn, Spinner } from '@nextui-org/react';
 
-export default function LoadingState({ message = 'Loading...' }) {
+export default function LoadingState({
+  message = 'Loading...',
+  fullHeight = false,
+}) {
   return (
-    <div className='flex flex-col items-center justify-center min-h-[200px] gap-4'>
+    <div
+      className={cn(
+        'flex flex-col items-center justify-center gap-4',
+        fullHeight ? 'absolute inset-0 h-dvh w-dvw' : 'min-h-[200px]'
+      )}
+    >
       <Spinner size='lg' color='primary' />
       <p className='text-default-500'>{message}</p>
     </div>

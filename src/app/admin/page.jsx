@@ -21,7 +21,8 @@ export default function AdminPage() {
     setIsLoading(false);
   }, [router]);
 
-  if (isLoading) return <LoadingState message='Verifying admin access...' />;
+  if (isLoading)
+    return <LoadingState message='Verifying admin access...' fullHeight />;
   if (error) return <ErrorState message={error} />;
 
   return (
