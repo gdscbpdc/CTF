@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import {
   Table,
   TableHeader,
@@ -21,8 +20,6 @@ import {
   SelectItem,
   Textarea,
 } from '@nextui-org/react';
-import { Search, Plus, Pencil, Trash2, Eye } from 'lucide-react';
-import { db } from '@/services/firebase.config';
 import {
   collection,
   query,
@@ -32,18 +29,12 @@ import {
   updateDoc,
   deleteDoc,
   addDoc,
-  where,
 } from 'firebase/firestore';
+import { useState, useEffect } from 'react';
+import { Search, Plus, Pencil, Trash2, Eye } from 'lucide-react';
 
-const CATEGORIES = [
-  'Web',
-  'Crypto',
-  'Forensics',
-  'Reversing',
-  'Misc',
-  'Prompt Engineering',
-];
-const DIFFICULTIES = ['Easy', 'Medium', 'Hard'];
+import { db } from '@/services/firebase.config';
+import { CHALLENGE_CATEGORIES, CHALLENGE_DIFFICULTIES } from '@/lib/constants';
 
 export default function ChallengeManager() {
   const [challenges, setChallenges] = useState([]);
@@ -327,7 +318,7 @@ export default function ChallengeManager() {
                     }
                     isDisabled={!editMode && selectedChallenge}
                   >
-                    {CATEGORIES.map((category) => (
+                    {CHALLENGE_CATEGORIES.map((category) => (
                       <SelectItem key={category} value={category}>
                         {category}
                       </SelectItem>
@@ -341,7 +332,7 @@ export default function ChallengeManager() {
                     }
                     isDisabled={!editMode && selectedChallenge}
                   >
-                    {DIFFICULTIES.map((difficulty) => (
+                    {CHALLENGE_DIFFICULTIES.map((difficulty) => (
                       <SelectItem key={difficulty} value={difficulty}>
                         {difficulty}
                       </SelectItem>

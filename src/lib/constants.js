@@ -1,27 +1,20 @@
 export const CHALLENGE_CATEGORIES = [
   'Web',
   'Crypto',
-  'Reversing',
   'Forensics',
-  'Stego',
-  'Pwn',
+  'Reversing',
   'Misc',
-  'OSINT',
-  'Mobile',
-  'Cloud',
+  'Prompt Engieering',
+  'PWN',
 ];
 
 export const CHALLENGE_CATEGORIES_COLORS = {
   Web: 'primary',
   Crypto: 'secondary',
-  Reversing: 'danger',
   Forensics: 'success',
-  Stego: 'warning',
-  Pwn: 'danger',
+  Reversing: 'danger',
   Misc: 'default',
-  OSINT: 'warning',
-  Mobile: 'secondary',
-  Cloud: 'primary',
+  PWN: 'danger',
 };
 
 export const CHALLENGE_DIFFICULTIES = ['Easy', 'Medium', 'Hard'];

@@ -32,7 +32,9 @@ export default function ChallengeCard({ challenge }) {
             <Chip
               variant='dot'
               size='sm'
-              color={CHALLENGE_CATEGORIES_COLORS[challenge.category]}
+              color={
+                CHALLENGE_CATEGORIES_COLORS[challenge.category] || 'default'
+              }
             >
               {challenge.category}
             </Chip>

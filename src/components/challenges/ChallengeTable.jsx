@@ -18,23 +18,14 @@ import { useRouter } from 'next/navigation';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { collection, query, onSnapshot } from 'firebase/firestore';
 
+import {
+  CHALLENGE_CATEGORIES,
+  CHALLENGE_DIFFICULTIES,
+  CHALLENGE_DIFFICULTIES_COLORS,
+} from '@/lib/constants';
 import LoadingState from '../ui/LoadingState';
 import { db } from '@/services/firebase.config';
 import { useAuth } from '@/contexts/AuthContext';
-
-const CHALLENGE_CATEGORIES = [
-  'Web',
-  'Crypto',
-  'Forensics',
-  'Reversing',
-  'Misc',
-];
-const CHALLENGE_DIFFICULTIES = ['Easy', 'Medium', 'Hard'];
-const CHALLENGE_DIFFICULTIES_COLORS = {
-  Easy: 'success',
-  Medium: 'warning',
-  Hard: 'danger',
-};
 
 const columns = [
   { name: 'TITLE', uid: 'title', sortable: true },

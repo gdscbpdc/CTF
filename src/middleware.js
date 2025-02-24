@@ -72,7 +72,7 @@ export async function middleware(request) {
         return NextResponse.redirect(new URL('/countdown', request.url));
       }
     } else {
-      if (isPublicRoute || isHomePage) {
+      if (isPublicRoute) {
         return NextResponse.redirect(new URL('/challenges', request.url));
       }
     }
