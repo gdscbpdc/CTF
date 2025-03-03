@@ -81,7 +81,7 @@ export default function LoginPage() {
 
   return (
     <div className='flex justify-center items-center absolute top-0 left-0 w-full h-full'>
-      <div className='w-full max-w-md space-y-8'>
+      <div className='w-full max-w-md space-y-6'>
         <h1 className='text-4xl font-bold text-center bg-gradient-to-r from-primary to-danger bg-clip-text text-transparent'>
           Welcome Back
         </h1>

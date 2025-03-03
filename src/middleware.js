@@ -40,7 +40,6 @@ export async function middleware(request) {
   const isAdminLoginRoute = pathname === '/admin/login';
   const isProtectedRoute = matchesRoute(pathname, protectedRoutes);
   const isPublicRoute = matchesRoute(pathname, publicRoutes);
-  const isHomePage = pathname === '/';
   const isCountdownPage = pathname === '/countdown';
 
   if (isAdminRoute) {

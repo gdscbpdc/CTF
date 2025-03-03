@@ -107,7 +107,7 @@ export default function ProfilePage() {
     return <ErrorState message={error} onRetry={loadProfileAndStats} />;
 
   return (
-    <div className='space-y-8'>
+    <div className='space-y-6'>
       <Card>
         <CardBody className='flex flex-col md:flex-row items-center gap-6 p-8'>
           <Avatar name={profile?.name} className='w-24 h-24 text-large' />
@@ -171,7 +171,7 @@ export default function ProfilePage() {
         </Card>
       </div>
 
-      <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
+      <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
         <Card>
           <CardHeader className='flex gap-3'>
             <Activity className='w-5 h-5' />

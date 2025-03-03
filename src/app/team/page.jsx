@@ -4,23 +4,23 @@ import {
   Card,
   CardBody,
   CardHeader,
+  Chip,
+  Avatar,
   Divider,
   Progress,
-  Avatar,
   Table,
   TableHeader,
-  TableBody,
   TableColumn,
+  TableBody,
   TableRow,
   TableCell,
-  Chip,
 } from '@nextui-org/react';
 import {
-  Trophy,
   Users,
-  Flag,
   Activity,
+  Trophy,
   Medal,
+  Flag,
   Target,
   Clock,
 } from 'lucide-react';
@@ -43,9 +43,7 @@ export default function TeamPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (user?.team?.id) {
-      loadTeamData();
-    }
+    if (user?.team?.id) loadTeamData();
   }, [user?.team?.id]);
 
   const loadTeamData = async () => {
@@ -87,7 +85,7 @@ export default function TeamPage() {
   }
 
   return (
-    <div className='space-y-8'>
+    <div className='space-y-6'>
       <Card>
         <CardBody className='py-8 flex flex-col md:flex-row items-center gap-6'>
           <Avatar name={user.team.teamName} className='w-24 h-24 text-large' />
@@ -150,8 +148,8 @@ export default function TeamPage() {
         </Card>
       </div>
 
-      <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
-        <div className='space-y-8'>
+      <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
+        <div className='space-y-6'>
           <Card>
             <CardHeader className='flex gap-3'>
               <Users className='w-5 h-5' />
@@ -219,7 +217,7 @@ export default function TeamPage() {
           </Card>
         </div>
 
-        <div className='space-y-8'>
+        <div className='space-y-6'>
           <Card>
             <CardHeader className='flex gap-3'>
               <Clock className='w-5 h-5' />

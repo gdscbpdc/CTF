@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { ScrollShadow } from '@nextui-org/react';
-import { db } from '@/services/firebase.config';
 import { collection, query, onSnapshot } from 'firebase/firestore';
+
 import ChallengeCard from './ChallengeCard';
-import LoadingState from '@/components/ui/LoadingState';
+import { db } from '@/services/firebase.config';
 import ErrorState from '@/components/ui/ErrorState';
+import LoadingState from '@/components/ui/LoadingState';
 
 export default function ChallengeGrid() {
   const [challenges, setChallenges] = useState([]);

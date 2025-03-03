@@ -1,4 +1,3 @@
-import { db } from '@/services/firebase.config';
 import {
   collection,
   query,
@@ -7,7 +6,11 @@ import {
   limit,
   where,
   startAfter,
+  getDoc,
+  doc,
 } from 'firebase/firestore';
+
+import { db } from '@/services/firebase.config';
 
 export async function getLeaderboard(page = 1, itemsPerPage = 10) {
   try {
@@ -91,8 +94,8 @@ export async function getTopTeams(count = 3) {
 
 export async function getTeamRank(teamId) {
   try {
-    const teamDoc = await db.collection('teams').doc(teamId).get();
-    if (!teamDoc.exists) {
+    const teamDoc = await getDoc(doc(db, 'teams', teamId));
+    if (!teamDoc.exists()) {
       return null;
     }
     const teamPoints = teamDoc.data().points;

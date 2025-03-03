@@ -15,7 +15,7 @@ export default function RootLayout({ children }) {
         <Providers>
           <Header />
 
-          <main className='flex-grow container mx-auto px-4 py-4 min-h-[calc(100vh-4rem)]'>
+          <main className='flex-grow container mx-auto px-4 py-8 min-h-[calc(100dvh-4rem)]'>
             {children}
           </main>
 

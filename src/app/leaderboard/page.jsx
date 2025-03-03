@@ -11,7 +11,6 @@ import {
   TableRow,
   TableCell,
   Pagination,
-  Chip,
 } from '@nextui-org/react';
 import { Trophy } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
@@ -51,7 +50,7 @@ export default function LeaderboardPage() {
     return <ErrorState message='No teams found' />;
 
   return (
-    <div className='space-y-8'>
+    <div className='space-y-6'>
       <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
         {leaderboard.teams.slice(0, 3).map((team, index) => (
           <Card
@@ -93,28 +92,30 @@ export default function LeaderboardPage() {
         <CardBody>
           <Table aria-label='Leaderboard'>
             <TableHeader>
+              <TableColumn>POSITION</TableColumn>
               <TableColumn>RANK</TableColumn>
               <TableColumn>TEAM</TableColumn>
               <TableColumn>POINTS</TableColumn>
               <TableColumn>SOLVES</TableColumn>
-              <TableColumn>STATUS</TableColumn>
             </TableHeader>
             <TableBody>
-              {leaderboard.teams.map((team) => (
+              {leaderboard.teams.map((team, index) => (
                 <TableRow key={team.id}>
-                  <TableCell>#{team.rank}</TableCell>
+                  <TableCell>
+                    {index === 0 ? (
+                      <Trophy className='w-5 h-5 text-yellow-500' />
+                    ) : index === 1 ? (
+                      <Trophy className='w-5 h-5 text-slate-400' />
+                    ) : index === 2 ? (
+                      <Trophy className='w-5 h-5 text-amber-600' />
+                    ) : (
+                      `#${index + 1}`
+                    )}
+                  </TableCell>
+                  <TableCell>{team.rank}</TableCell>
                   <TableCell>{team.teamName}</TableCell>
                   <TableCell>{team.points}</TableCell>
                   <TableCell>{team.solvedChallenges?.length || 0}</TableCell>
-                  <TableCell>
-                    <Chip
-                      color={team.isActive ? 'success' : 'default'}
-                      variant='flat'
-                      size='sm'
-                    >
-                      {team.isActive ? 'Active' : 'Inactive'}
-                    </Chip>
-                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

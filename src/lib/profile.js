@@ -15,6 +15,7 @@ import {
   EmailAuthProvider,
   reauthenticateWithCredential,
 } from 'firebase/auth';
+import { getTeamRank } from '@/lib/leaderboard';
 
 export async function getUserProfile(userId) {
   try {
@@ -44,22 +45,59 @@ export async function getUserProfile(userId) {
     );
 
     const activitySnapshot = await getDocs(activityQuery);
-    const recentActivity = [];
 
-    for (const docSnap of activitySnapshot.docs) {
-      const solve = docSnap.data();
-      const challenge = await getDoc(doc(db, 'challenges', solve.challengeId));
-
-      if (challenge.exists()) {
-        recentActivity.push({
-          id: doc.id,
-          type: 'solve',
-          description: `Solved ${challenge.data().title}`,
-          points: challenge.data().points,
-          timestamp: solve.timestamp?.toDate(),
-        });
-      }
+    if (activitySnapshot.empty) {
+      return {
+        id: userId,
+        name: userData.name,
+        email: userData.email,
+        team: teamData,
+        totalPoints: teamData?.points || 0,
+        solvedChallenges: teamData?.solvedChallenges || [],
+        rank: await getTeamRank(teamData?.id),
+        recentActivity: [],
+        registeredAt: userData.registeredAt,
+      };
     }
+
+    const challengeIds = activitySnapshot.docs.map(
+      (doc) => doc.data().challengeId
+    );
+
+    const challengesRef = collection(db, 'challenges');
+    const challengesSnapshot = await getDocs(
+      query(challengesRef, where('__name__', 'in', challengeIds))
+    );
+
+    const challengeMap = {};
+    challengesSnapshot.docs.forEach((doc) => {
+      challengeMap[doc.id] = {
+        id: doc.id,
+        ...doc.data(),
+      };
+    });
+
+    const recentActivity = activitySnapshot.docs
+      .map((docSnap) => {
+        const solve = docSnap.data();
+        const challenge = challengeMap[solve.challengeId];
+
+        if (!challenge) {
+          return null;
+        }
+
+        return {
+          id: docSnap.id,
+          challengeId: solve.challengeId,
+          isCorrect: solve.isCorrect,
+          description: `${solve.isCorrect ? 'Solved' : 'Attempted'} ${
+            challenge.title
+          }`,
+          points: solve.isCorrect ? challenge.points : 0,
+          timestamp: solve.timestamp?.toDate(),
+        };
+      })
+      .filter(Boolean);
 
     const solvedChallenges = teamData?.solvedChallenges || [];
     const totalPoints = teamData?.points || 0;

@@ -136,30 +136,57 @@ export async function getTeamActivity(teamId, activityLimit = 10) {
     const activityQuery = query(
       collection(db, 'solves'),
       where('teamId', '==', teamId),
+      where('isCorrect', '==', true),
       orderBy('timestamp', 'desc'),
       limit(activityLimit)
     );
 
     const activitySnapshot = await getDocs(activityQuery);
-    const activity = [];
 
-    for (const doc of activitySnapshot.docs) {
-      const solve = doc.data();
-      const challenge = await getDoc(doc(db, 'challenges', solve.challengeId));
-
-      if (challenge.exists()) {
-        activity.push({
-          id: doc.id,
-          ...solve,
-          challenge: {
-            id: challenge.id,
-            name: challenge.data().name,
-            category: challenge.data().category,
-            points: challenge.data().points,
-          },
-        });
-      }
+    if (activitySnapshot.empty) {
+      return [];
     }
+
+    const challengeIds = activitySnapshot.docs.map(
+      (doc) => doc.data().challengeId
+    );
+
+    const challengesRef = collection(db, 'challenges');
+    const challengesSnapshot = await getDocs(
+      query(challengesRef, where('__name__', 'in', challengeIds))
+    );
+
+    const challengeMap = {};
+    challengesSnapshot.docs.forEach((doc) => {
+      challengeMap[doc.id] = {
+        id: doc.id,
+        ...doc.data(),
+      };
+    });
+
+    const activity = activitySnapshot.docs
+      .map((doc) => {
+        const solve = doc.data();
+        const challenge = challengeMap[solve.challengeId];
+
+        if (!challenge) {
+          return null;
+        }
+
+        return {
+          id: doc.id,
+          timestamp: solve.timestamp?.toDate(),
+          isCorrect: solve.isCorrect,
+          challenge: {
+            id: solve.challengeId,
+            name: challenge.title,
+            category: challenge.category,
+            points: challenge.points,
+          },
+          userId: solve.userId,
+        };
+      })
+      .filter(Boolean);
 
     return activity;
   } catch (error) {

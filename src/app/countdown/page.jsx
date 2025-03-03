@@ -46,7 +46,7 @@ export default function CountdownPage() {
   return (
     <div className='min-h-[80vh] flex flex-col items-center justify-center'>
       <Card className='w-full max-w-4xl bg-gradient-to-br from-primary-500/10 via-secondary-500/10 to-danger-500/10'>
-        <CardBody className='py-12 text-center space-y-8'>
+        <CardBody className='py-12 text-center space-y-6'>
           <div className='space-y-4'>
             <h1 className='text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-danger bg-clip-text text-transparent'>
               Event Starting Soon

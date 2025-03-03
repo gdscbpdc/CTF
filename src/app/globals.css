@@ -5,8 +5,10 @@
 /* @import '/public/fonts/fonts.css'; */
 
 :root {
-  --foreground: #ffffff !important;
-  --background: #141d2b !important;
+  --foreground: #f3f3f3 !important;
+  --background: #080305 !important;
+  --red-color: #A90200 !important;
+
   --green-color: #9fef00 !important;
 
   --background-secondary: #111927 !important;

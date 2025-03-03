@@ -52,7 +52,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className='grid md:grid-cols-3 gap-8'>
+        <section className='grid md:grid-cols-3 gap-6'>
           <Card className='p-6 space-y-4'>
             <Flag className='w-12 h-12 text-primary' />
             <h2 className='text-xl font-bold'>Diverse Challenges</h2>
@@ -128,12 +128,12 @@ export default function HomePage() {
     );
   } else
     return (
-      <div className='space-y-8 overflow-visible'>
-        <section className='text-center bg-gradient-to-r from-background/80 via-primary/80 to-background/80 rounded-xl p-12'>
-          <h1 className='text-4xl font-bold text-white mb-4'>
+      <div className='space-y-6 overflow-visible'>
+        <section className='text-center bg-gradient-to-r from-background/80 via-primary/80 to-background/80 rounded-xl p-12 space-y-4'>
+          <h1 className='text-3xl md:text-4xl font-bold text-white'>
             Welcome back, {user.name}!
           </h1>
-          <p className='text-xl text-white/80 max-w-2xl mx-auto'>
+          <p className='md:text-xl text-white/80 max-w-2xl mx-auto'>
             Continue solving challenges and climb the leaderboard with your
             team.
           </p>
@@ -141,7 +141,7 @@ export default function HomePage() {
 
         <ChallengeGrid />
 
-        <div className='grid md:grid-cols-2 gap-8'>
+        <div className='grid md:grid-cols-2 gap-6'>
           <RecentSolves />
           <LeaderboardPreview />
         </div>

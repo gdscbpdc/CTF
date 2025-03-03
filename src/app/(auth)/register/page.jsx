@@ -114,7 +114,7 @@ export default function RegisterPage() {
 
   return (
     <div className='flex justify-center items-center size-full'>
-      <div className='w-full max-w-2xl space-y-8'>
+      <div className='w-full max-w-2xl space-y-6'>
         <div className='text-center space-y-2'>
           <h1 className='text-4xl font-bold bg-gradient-to-r from-primary to-danger bg-clip-text text-transparent'>
             Create Your Team

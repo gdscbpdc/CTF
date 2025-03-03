@@ -125,7 +125,7 @@ export default function LeaderboardPreview() {
               <span className='font-medium'>{team.teamName}</span>
             </div>
             <div className='flex items-center gap-2'>
-              <span className='font-bold text-primary'>{team.points} pts</span>
+              <span className='font-bold text-success'>{team.points} pts</span>
               {team.lastSolveTime && (
                 <span className='text-tiny text-default-400'>
                   Last solve: {formatRelativeTime(team.lastSolveTime)}

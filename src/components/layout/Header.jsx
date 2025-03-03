@@ -18,11 +18,12 @@ import {
 import Link from 'next/link';
 import Cookies from 'js-cookie';
 import { useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Trophy, Flag, Users, LogOut, User, Home, Shield } from 'lucide-react';
 
 import { logoutUser } from '@/lib/auth';
 import { useAuth } from '@/contexts/AuthContext';
+import Image from 'next/image';
 
 const navItems = [
   {
@@ -50,20 +51,21 @@ const navItems = [
 ];
 
 export default function Header() {
-  const { user, loading } = useAuth();
+  const router = useRouter();
   const pathname = usePathname();
+  const { user, loading } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const isAdminPage = pathname.startsWith('/admin');
   const isAdminLoggedIn = !!Cookies.get('admin-secret');
 
   const handleLogout = async () => {
     await logoutUser();
-    window.location.href = '/';
+    router.replace('/');
   };
 
   const handleAdminLogout = () => {
     Cookies.remove('admin-secret');
-    window.location.href = '/';
+    router.replace('/');
   };
 
   if (loading) {
@@ -73,24 +75,33 @@ export default function Header() {
   return (
     <Navbar
       isBordered
+      maxWidth='full'
       isMenuOpen={isMenuOpen}
       onMenuOpenChange={setIsMenuOpen}
-      className='mb-6'
-      maxWidth='full'
     >
       <NavbarContent className='sm:hidden pr-3' justify='start'>
         <NavbarBrand>
-          <p className='font-bold text-inherit'>
-            {isAdminPage ? 'GDG CTF Admin' : 'GDG CTF'}
-          </p>
+          <Image
+            src='/logo.png'
+            alt='GDG CTF Logo'
+            width={100}
+            height={100}
+            className='h-8 w-auto'
+          />
+          {isAdminPage && <p className='font-bold text-inherit'>Admin</p>}
         </NavbarBrand>
       </NavbarContent>
 
       <NavbarContent className='hidden sm:flex' justify='start'>
         <NavbarBrand>
-          <p className='font-bold text-inherit'>
-            {isAdminPage ? 'GDG CTF Admin' : 'GDG CTF'}
-          </p>
+          <Image
+            src='/logo.png'
+            alt='GDG CTF Logo'
+            width={100}
+            height={100}
+            className='h-8 w-auto'
+          />
+          {isAdminPage && <p className='ml-4 font-bold text-inherit'>Admin</p>}
         </NavbarBrand>
       </NavbarContent>
 
@@ -106,6 +117,7 @@ export default function Header() {
                 className='hidden sm:flex'
               >
                 <Link
+                  prefetch
                   className={`flex items-center gap-2 ${
                     pathname === item.href
                       ? 'text-primary'
@@ -146,7 +158,7 @@ export default function Header() {
             </NavbarItem>
           )
         ) : user ? (
-          <NavbarItem>
+          <NavbarItem className='hidden sm:flex'>
             <Dropdown placement='bottom-end'>
               <DropdownTrigger>
                 <Avatar
@@ -160,14 +172,18 @@ export default function Header() {
                   key='profile'
                   startContent={<User className='w-4 h-4' />}
                 >
-                  <Link href='/profile'>Profile</Link>
+                  <Link href='/profile' prefetch>
+                    Profile
+                  </Link>
                 </DropdownItem>
                 {isAdminLoggedIn && (
                   <DropdownItem
                     key='admin'
                     startContent={<Shield className='w-4 h-4' />}
                   >
-                    <Link href='/admin'>Admin Panel</Link>
+                    <Link href='/admin' prefetch>
+                      Admin Panel
+                    </Link>
                   </DropdownItem>
                 )}
                 <DropdownItem
@@ -210,6 +226,7 @@ export default function Header() {
             return (
               <NavbarMenuItem key={item.href}>
                 <Link
+                  prefetch
                   className={`flex items-center gap-2 w-full ${
                     pathname === item.href
                       ? 'text-primary'
@@ -223,6 +240,44 @@ export default function Header() {
               </NavbarMenuItem>
             );
           })}
+
+        <NavbarMenuItem key='profile'>
+          <Link
+            href='/profile'
+            className={`flex items-center gap-2 w-full ${
+              pathname === '/profile' ? 'text-primary' : 'text-foreground-500'
+            }`}
+          >
+            <User className='w-4 h-4' />
+            Profile
+          </Link>
+        </NavbarMenuItem>
+
+        {isAdminLoggedIn && (
+          <NavbarMenuItem key='admin'>
+            <Link
+              href='/admin'
+              className={`flex items-center gap-2 w-full ${
+                pathname === '/admin' ? 'text-primary' : 'text-foreground-500'
+              }`}
+            >
+              <Shield className='w-4 h-4' />
+              Admin Panel
+            </Link>
+          </NavbarMenuItem>
+        )}
+
+        <NavbarMenuItem key='logout'>
+          <Button
+            fullWidth
+            variant='flat'
+            color='danger'
+            startContent={<LogOut className='w-4 h-4' />}
+            onPress={handleLogout}
+          >
+            Log Out
+          </Button>
+        </NavbarMenuItem>
 
         {!user && !isAdminPage && (
           <>

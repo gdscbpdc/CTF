@@ -32,11 +32,9 @@ export async function getAllChallenges() {
 
 export async function getChallengeById(id) {
   try {
-    console.log('Getting challenge document for ID:', id);
     const challengeDoc = await getDoc(doc(db, 'challenges', id));
 
     if (!challengeDoc.exists()) {
-      console.log('Challenge document does not exist');
       return null;
     }
 
@@ -44,7 +42,6 @@ export async function getChallengeById(id) {
       id: challengeDoc.id,
       ...challengeDoc.data(),
     };
-    console.log('Retrieved challenge data:', challengeData);
     return challengeData;
   } catch (error) {
     console.error('Error getting challenge:', error);

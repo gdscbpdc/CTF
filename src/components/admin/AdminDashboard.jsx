@@ -19,6 +19,8 @@ import {
   onSnapshot,
   where,
   getDocs,
+  doc,
+  getDoc,
 } from 'firebase/firestore';
 import {
   LineChart,
@@ -39,6 +41,7 @@ export default function AdminDashboard() {
   const [solveStats, setSolveStats] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isActivityLoading, setIsActivityLoading] = useState(true);
 
   useEffect(() => {
     loadDashboardData();
@@ -98,22 +101,23 @@ export default function AdminDashboard() {
       limit(10)
     );
 
+    setIsActivityLoading(true);
     return onSnapshot(q, async (snapshot) => {
       const activity = [];
-      for (const doc of snapshot.docs) {
-        const solve = doc.data();
+      for (const document of snapshot.docs) {
+        const solve = document.data();
 
-        const teamDoc = await getDocs(doc(db, 'teams', solve.teamId));
+        const teamDoc = await getDoc(doc(db, 'teams', solve.teamId));
         const team = teamDoc.exists() ? teamDoc.data() : null;
 
-        const challengeDoc = await getDocs(
+        const challengeDoc = await getDoc(
           doc(db, 'challenges', solve.challengeId)
         );
         const challenge = challengeDoc.exists() ? challengeDoc.data() : null;
 
         if (team && challenge) {
           activity.push({
-            id: doc.id,
+            id: document.id,
             teamName: team.teamName,
             challengeTitle: challenge.title,
             points: challenge.points,
@@ -122,6 +126,7 @@ export default function AdminDashboard() {
         }
       }
       setRecentActivity(activity);
+      setIsActivityLoading(false);
     });
   };
 
@@ -130,7 +135,7 @@ export default function AdminDashboard() {
   if (error) return <ErrorState message={error} onRetry={loadDashboardData} />;
 
   return (
-    <div className='space-y-8'>
+    <div className='space-y-6'>
       <div className='grid grid-cols-1 md:grid-cols-4 gap-6'>
         <Card>
           <CardBody className='flex flex-row items-center gap-4'>
@@ -190,11 +195,19 @@ export default function AdminDashboard() {
               <LineChart data={solveStats}>
                 <XAxis dataKey='date' />
                 <YAxis />
-                <Tooltip />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'var(--background)',
+                    borderRadius: '8px',
+                    border: '1px solid var(--divider)',
+                  }}
+                  labelStyle={{ color: 'var(--foreground)' }}
+                  itemStyle={{ color: 'var(--foreground)' }}
+                />
                 <Line
                   type='monotone'
                   dataKey='solves'
-                  stroke='var(--primary)'
+                  stroke='var(--red-color)'
                   strokeWidth={2}
                 />
               </LineChart>
@@ -215,24 +228,34 @@ export default function AdminDashboard() {
         </CardHeader>
         <Divider />
         <CardBody>
-          <div className='space-y-4'>
-            {recentActivity.map((activity) => (
-              <div
-                key={activity.id}
-                className='flex items-center justify-between'
-              >
-                <div>
-                  <p className='font-medium'>
-                    {activity.teamName} solved {activity.challengeTitle}
-                  </p>
-                  <p className='text-small text-default-500'>
-                    {activity.timestamp.toLocaleString()}
-                  </p>
+          {isActivityLoading ? (
+            <LoadingState message='Loading recent activity...' />
+          ) : (
+            <div className='space-y-4'>
+              {recentActivity.map((activity) => (
+                <div
+                  key={activity.id}
+                  className='flex items-center justify-between'
+                >
+                  <div>
+                    <p className='font-medium'>
+                      <span className='text-primary font-bold'>
+                        {activity.teamName}
+                      </span>{' '}
+                      solved{' '}
+                      <span className='text-secondary font-bold'>
+                        {activity.challengeTitle}
+                      </span>
+                    </p>
+                    <p className='text-small text-default-500'>
+                      {activity.timestamp.toLocaleString()}
+                    </p>
+                  </div>
+                  <div className='text-success'>+{activity.points} pts</div>
                 </div>
-                <div className='text-success'>+{activity.points} pts</div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardBody>
       </Card>
 

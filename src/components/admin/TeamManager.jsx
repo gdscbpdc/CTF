@@ -25,7 +25,6 @@ import { db } from '@/services/firebase.config';
 import {
   collection,
   query,
-  orderBy,
   getDocs,
   doc,
   updateDoc,
@@ -72,18 +71,11 @@ const SORT_OPTIONS = [
   },
 ];
 
-const STATUS_OPTIONS = [
-  { key: 'all', label: 'All Teams' },
-  { key: 'active', label: 'Active Teams' },
-  { key: 'inactive', label: 'Inactive Teams' },
-];
-
 export default function TeamManager() {
   const [teams, setTeams] = useState([]);
   const [filteredTeams, setFilteredTeams] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOption, setSortOption] = useState('teamName-asc');
-  const [statusFilter, setStatusFilter] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
   const [selectedTeam, setSelectedTeam] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -95,7 +87,7 @@ export default function TeamManager() {
 
   useEffect(() => {
     filterAndSortTeams();
-  }, [searchQuery, sortOption, statusFilter, teams]);
+  }, [searchQuery, sortOption, teams]);
 
   const subscribeToTeams = () => {
     try {
@@ -104,12 +96,12 @@ export default function TeamManager() {
         q,
         async (snapshot) => {
           const teamsData = [];
-          for (const doc of snapshot.docs) {
-            const team = doc.data();
+          for (const document of snapshot.docs) {
+            const team = document.data();
 
             const membersQuery = query(
               collection(db, 'users'),
-              where('teamId', '==', doc.id)
+              where('teamId', '==', document.id)
             );
             const membersSnapshot = await getDocs(membersQuery);
             const members = membersSnapshot.docs.map((memberDoc) => ({
@@ -118,7 +110,7 @@ export default function TeamManager() {
             }));
 
             teamsData.push({
-              id: doc.id,
+              id: document.id,
               ...team,
               members,
             });
@@ -150,12 +142,6 @@ export default function TeamManager() {
       );
     }
 
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(
-        (team) => (statusFilter === 'active') === team.isActive
-      );
-    }
-
     const [field, direction] = sortOption.split('-');
     filtered.sort((a, b) => {
       let comparison = 0;
@@ -172,58 +158,39 @@ export default function TeamManager() {
     setFilteredTeams(filtered);
   };
 
-  const toggleTeamStatus = async (teamId, currentStatus) => {
-    try {
-      await updateDoc(doc(db, 'teams', teamId), {
-        isActive: !currentStatus,
-      });
-    } catch (error) {
-      console.error('Error updating team status:', error);
-    }
-  };
-
   const handleViewTeam = (team) => {
     setSelectedTeam(team);
     onOpen();
   };
 
   return (
-    <div className='space-y-4'>
-      <div className='flex flex-col sm:flex-row gap-4'>
+    <div className='flex flex-col gap-4'>
+      <div className='flex flex-wrap flex-col sm:flex-row justify-start gap-3'>
         <Input
           isClearable
-          className='w-full sm:max-w-[44%]'
+          classNames={{
+            base: 'w-full sm:max-w-xl',
+            inputWrapper: 'border-1 h-14',
+          }}
+          variant='bordered'
           placeholder='Search by team name or member...'
-          startContent={<Search className='w-4 h-4 text-default-400' />}
+          startContent={<Search className='text-default-300' />}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        <div className='flex flex-wrap gap-4'>
-          <Select
-            label='Sort by'
-            className='w-full sm:max-w-[200px]'
-            value={sortOption}
-            onChange={(e) => setSortOption(e.target.value)}
-          >
-            {SORT_OPTIONS.map((option) => (
-              <SelectItem key={option.key} value={option.key}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </Select>
-          <Select
-            label='Status'
-            className='w-full sm:max-w-[200px]'
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            {STATUS_OPTIONS.map((option) => (
-              <SelectItem key={option.key} value={option.key}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </Select>
-        </div>
+        <Select
+          label='Sort by'
+          className='w-full sm:max-w-[200px]'
+          variant='bordered'
+          value={sortOption}
+          onChange={(e) => setSortOption(e.target.value)}
+        >
+          {SORT_OPTIONS.map((option) => (
+            <SelectItem key={option.key} value={option.key}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </Select>
       </div>
 
       <Table aria-label='Teams table'>
@@ -232,7 +199,6 @@ export default function TeamManager() {
           <TableColumn>MEMBERS</TableColumn>
           <TableColumn>POINTS</TableColumn>
           <TableColumn>SOLVES</TableColumn>
-          <TableColumn>STATUS</TableColumn>
           <TableColumn>ACTIONS</TableColumn>
         </TableHeader>
         <TableBody
@@ -251,24 +217,16 @@ export default function TeamManager() {
                 </div>
               </TableCell>
               <TableCell>
-                <div className='flex flex-col gap-1'>
+                <div className='flex flex-wrap gap-2'>
                   {team.members.map((member) => (
-                    <div key={member.id} className='text-small'>
+                    <Chip key={member.id} variant='flat'>
                       {member.name}
-                    </div>
+                    </Chip>
                   ))}
                 </div>
               </TableCell>
               <TableCell>{team.points}</TableCell>
               <TableCell>{team.solvedChallenges?.length || 0}</TableCell>
-              <TableCell>
-                <Chip
-                  color={team.isActive ? 'success' : 'danger'}
-                  variant='flat'
-                >
-                  {team.isActive ? 'Active' : 'Inactive'}
-                </Chip>
-              </TableCell>
               <TableCell>
                 <div className='flex gap-2'>
                   <Button
@@ -277,18 +235,6 @@ export default function TeamManager() {
                     onPress={() => handleViewTeam(team)}
                   >
                     <Eye className='w-4 h-4' />
-                  </Button>
-                  <Button
-                    isIconOnly
-                    variant='light'
-                    color={team.isActive ? 'danger' : 'success'}
-                    onPress={() => toggleTeamStatus(team.id, team.isActive)}
-                  >
-                    {team.isActive ? (
-                      <Ban className='w-4 h-4' />
-                    ) : (
-                      <CheckCircle className='w-4 h-4' />
-                    )}
                   </Button>
                 </div>
               </TableCell>
@@ -301,57 +247,53 @@ export default function TeamManager() {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader>Team Details</ModalHeader>
+              <ModalHeader className='flex flex-row items-center gap-2'>
+                <h2 className='text-xl font-bold'>{selectedTeam.teamName}</h2>
+
+                <Chip color='primary'>{selectedTeam.rank}</Chip>
+
+                <Chip variant='flat'>{selectedTeam.points} pts</Chip>
+              </ModalHeader>
               <ModalBody>
                 {selectedTeam && (
-                  <div className='space-y-4'>
-                    <div>
-                      <h3 className='text-lg font-semibold'>
-                        Team Information
-                      </h3>
-                      <p>Name: {selectedTeam.teamName}</p>
-                      <p>Points: {selectedTeam.points}</p>
-                      <p>
-                        Solves: {selectedTeam.solvedChallenges?.length || 0}
-                      </p>
-                      <p>
-                        Status:{' '}
-                        <Chip
-                          color={selectedTeam.isActive ? 'success' : 'danger'}
-                          variant='flat'
-                        >
-                          {selectedTeam.isActive ? 'Active' : 'Inactive'}
-                        </Chip>
-                      </p>
-                    </div>
+                  <div className='space-y-6'>
+                    <div className='space-y-2'>
+                      <h3 className='text-lg font-semibold'>Members</h3>
 
-                    <div>
-                      <h3 className='text-lg font-semibold'>Team Members</h3>
                       <div className='space-y-2'>
                         {selectedTeam.members.map((member) => (
                           <div
                             key={member.id}
-                            className='flex justify-between items-center'
+                            className='p-3 rounded-lg bg-default-100'
                           >
-                            <div>
-                              <p className='font-medium'>{member.name}</p>
-                              <p className='text-small text-default-500'>
-                                {member.email}
-                              </p>
-                            </div>
+                            <p className='font-medium'>{member.name}</p>
+                            <p className='text-sm text-default-500'>
+                              {member.email}
+                            </p>
                           </div>
                         ))}
                       </div>
                     </div>
 
                     {selectedTeam.solvedChallenges?.length > 0 && (
-                      <div>
-                        <h3 className='text-lg font-semibold'>
-                          Solved Challenges
-                        </h3>
+                      <div className='space-y-2'>
+                        <div className='flex flex-row justify-between items-center gap-2'>
+                          <h3 className='text-lg font-semibold'>
+                            Solved Challenges
+                          </h3>
+
+                          <p className='text-default-500'>
+                            {selectedTeam.solvedChallenges.length}
+                          </p>
+                        </div>
                         <div className='space-y-2'>
                           {selectedTeam.solvedChallenges.map((challengeId) => (
-                            <div key={challengeId}>{challengeId}</div>
+                            <div
+                              key={challengeId}
+                              className='p-3 rounded-lg bg-default-100'
+                            >
+                              <p className='font-medium'>{challengeId}</p>
+                            </div>
                           ))}
                         </div>
                       </div>
@@ -360,7 +302,7 @@ export default function TeamManager() {
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button variant='light' onPress={onClose}>
+                <Button color='primary' onPress={onClose}>
                   Close
                 </Button>
               </ModalFooter>
