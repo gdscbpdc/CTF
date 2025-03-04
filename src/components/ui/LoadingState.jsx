@@ -8,7 +8,9 @@ export default function LoadingState({
     <div
       className={cn(
         'flex flex-col items-center justify-center gap-4',
-        fullHeight ? 'absolute inset-0 h-dvh w-dvw' : 'min-h-[200px]'
+        fullHeight
+          ? 'absolute z-10 inset-0 h-dvh w-dvw bg-background'
+          : 'min-h-[200px]'
       )}
     >
       <Spinner size='lg' color='primary' />

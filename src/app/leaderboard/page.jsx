@@ -19,6 +19,7 @@ import { getLeaderboard } from '@/lib/leaderboard';
 import ErrorState from '@/components/ui/ErrorState';
 import LoadingState from '@/components/ui/LoadingState';
 import Podium from '@/components/leaderboard/podium';
+import CountdownTimer from '@/components/leaderboard/CountdownTimer';
 
 export default function LeaderboardPage() {
   const [leaderboard, setLeaderboard] = useState(null);
@@ -52,6 +53,8 @@ export default function LeaderboardPage() {
 
   return (
     <div className='space-y-6'>
+      <CountdownTimer />
+
       <div className='grid grid-cols-3 gap-6'>
         <Podium
           team={leaderboard.teams[1]}
