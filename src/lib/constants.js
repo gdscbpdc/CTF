@@ -4,7 +4,6 @@ export const CHALLENGE_CATEGORIES = [
   'Forensics',
   'Reverse Engineering',
   'Misc',
-  'Prompt Engieering',
   'PWN',
 ];
 
