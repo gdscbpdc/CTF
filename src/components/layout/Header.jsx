@@ -139,24 +139,26 @@ export default function Header() {
         </NavbarItem> */}
 
         {isAdminPage ? (
-          pathname.includes('/admin') ? (
+          <>
             <NavbarItem>
               <Button as={Link} href='/' color='primary'>
                 Home
               </Button>
             </NavbarItem>
-          ) : (
-            <NavbarItem>
-              <Button
-                color='danger'
-                variant='flat'
-                startContent={<LogOut className='w-4 h-4' />}
-                onPress={handleAdminLogout}
-              >
-                Admin Logout
-              </Button>
-            </NavbarItem>
-          )
+
+            {pathname.includes('/admin') && (
+              <NavbarItem>
+                <Button
+                  color='danger'
+                  variant='flat'
+                  startContent={<LogOut className='w-4 h-4' />}
+                  onPress={handleAdminLogout}
+                >
+                  Admin Logout
+                </Button>
+              </NavbarItem>
+            )}
+          </>
         ) : user ? (
           <NavbarItem className='hidden sm:flex'>
             <Dropdown placement='bottom-end'>
