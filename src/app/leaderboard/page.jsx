@@ -18,6 +18,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { getLeaderboard } from '@/lib/leaderboard';
 import ErrorState from '@/components/ui/ErrorState';
 import LoadingState from '@/components/ui/LoadingState';
+import Podium from '@/components/leaderboard/podium';
 
 export default function LeaderboardPage() {
   const [leaderboard, setLeaderboard] = useState(null);
@@ -51,38 +52,22 @@ export default function LeaderboardPage() {
 
   return (
     <div className='space-y-6'>
-      <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-        {leaderboard.teams.slice(0, 3).map((team, index) => (
-          <Card
-            key={team.id}
-            className={
-              index === 0
-                ? 'bg-gradient-to-br from-yellow-500/20 to-yellow-600/20'
-                : index === 1
-                ? 'bg-gradient-to-br from-slate-400/20 to-slate-500/20'
-                : 'bg-gradient-to-br from-amber-600/20 to-amber-700/20'
-            }
-          >
-            <CardBody className='py-8 text-center space-y-4'>
-              <Trophy
-                className={
-                  index === 0
-                    ? 'w-12 h-12 mx-auto text-yellow-500'
-                    : index === 1
-                    ? 'w-12 h-12 mx-auto text-slate-400'
-                    : 'w-12 h-12 mx-auto text-amber-600'
-                }
-              />
-              <div>
-                <p className='text-xl font-bold'>{team.teamName}</p>
-                <p className='text-default-500'>
-                  {team.points} points • {team.solvedChallenges?.length || 0}{' '}
-                  solves
-                </p>
-              </div>
-            </CardBody>
-          </Card>
-        ))}
+      <div className='grid grid-cols-3 gap-6'>
+        <Podium
+          team={leaderboard.teams[1]}
+          index={1}
+          key={leaderboard.teams[1].id}
+        />
+        <Podium
+          team={leaderboard.teams[0]}
+          index={0}
+          key={leaderboard.teams[0].id}
+        />
+        <Podium
+          team={leaderboard.teams[2]}
+          index={2}
+          key={leaderboard.teams[2].id}
+        />
       </div>
 
       <Card>
