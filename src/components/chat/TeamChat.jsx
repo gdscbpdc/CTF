@@ -13,6 +13,7 @@ import {
 import { Send } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { db } from '@/services/firebase.config';
+import { toast } from 'sonner';
 import {
   collection,
   query,
@@ -42,25 +43,27 @@ export default function TeamChat() {
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const newMessages = [];
-      snapshot.forEach((doc) => {
-        newMessages.push({ id: doc.id, ...doc.data() });
-      });
-      setMessages(newMessages.reverse());
-      scrollToBottom();
+      const allMessages = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setMessages(allMessages.reverse());
     });
 
     return () => unsubscribe();
   }, [user?.team?.id]);
 
-  const scrollToBottom = () => {
-    setTimeout(() => {
+  useEffect(() => {
+    if (messages.length > 0) {
       chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
-  };
+    }
+  }, [messages]);
 
   const handleSend = async () => {
     if (!message.trim() || !user?.team?.id) return;
+
+    const trimmedMessage = message.trim();
+    setMessage('');
 
     try {
       setIsLoading(true);
@@ -68,12 +71,15 @@ export default function TeamChat() {
         teamId: user.team.id,
         userId: user.id,
         userName: user.name,
-        message: message.trim(),
+        message: trimmedMessage,
         timestamp: serverTimestamp(),
       });
-      setMessage('');
     } catch (error) {
       console.error('Error sending message:', error);
+      toast.error('Failed to send message', {
+        description: error.message,
+      });
+      setMessage(trimmedMessage);
     } finally {
       setIsLoading(false);
     }

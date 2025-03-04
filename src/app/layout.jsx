@@ -1,4 +1,6 @@
 import './globals.css';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { NotificationProvider } from '@/contexts/NotificationContext';
 import { Providers } from './providers';
 import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
@@ -13,12 +15,14 @@ export default function RootLayout({ children }) {
     <html lang='en' className='dark' suppressHydrationWarning>
       <body className='antialiased text-foreground bg-background'>
         <Providers>
-          <Header />
-
-          <main className='flex-grow container mx-auto px-4 py-8 min-h-[calc(100dvh-4rem)]'>
-            {children}
-          </main>
-
+          <AuthProvider>
+            <NotificationProvider>
+              <div className='min-h-screen'>
+                <Header />
+                <main className='container mx-auto p-4 lg:p-8'>{children}</main>
+              </div>
+            </NotificationProvider>
+          </AuthProvider>
           <Footer />
         </Providers>
       </body>

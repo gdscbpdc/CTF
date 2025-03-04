@@ -5,6 +5,7 @@ import { Card, CardBody, Input, Button, Divider } from '@nextui-org/react';
 import { registerTeam } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { toast } from 'sonner';
 import {
   User,
   Mail,
@@ -53,6 +54,9 @@ export default function RegisterPage() {
   const validateForm = () => {
     if (!teamName || teamName.length < 3) {
       setError('Team name must be at least 3 characters long');
+      toast.error('Invalid team name', {
+        description: 'Team name must be at least 3 characters long',
+      });
       return false;
     }
 
@@ -61,11 +65,19 @@ export default function RegisterPage() {
 
       if (!member.name || member.name.length < 2) {
         setError(`Member ${i + 1}: Name must be at least 2 characters long`);
+        toast.error('Invalid member name', {
+          description: `Member ${
+            i + 1
+          }: Name must be at least 2 characters long`,
+        });
         return false;
       }
 
       if (!member.email || !member.email.includes('@')) {
         setError(`Member ${i + 1}: Invalid email address`);
+        toast.error('Invalid email', {
+          description: `Member ${i + 1}: Please enter a valid email address`,
+        });
         return false;
       }
 
@@ -73,11 +85,19 @@ export default function RegisterPage() {
         setError(
           `Member ${i + 1}: Password must be at least 8 characters long`
         );
+        toast.error('Invalid password', {
+          description: `Member ${
+            i + 1
+          }: Password must be at least 8 characters long`,
+        });
         return false;
       }
 
       if (member.password !== member.confirmPassword) {
         setError(`Member ${i + 1}: Passwords do not match`);
+        toast.error('Password mismatch', {
+          description: `Member ${i + 1}: Passwords do not match`,
+        });
         return false;
       }
     }
@@ -95,18 +115,31 @@ export default function RegisterPage() {
         return;
       }
 
+      toast.loading('Creating your team...', {
+        description: 'Please wait while we set up your team',
+      });
+
       const result = await registerTeam({
         teamName,
         members: members.map(({ confirmPassword, ...member }) => member),
       });
 
       if (result.success) {
+        toast.success('Team created successfully!', {
+          description: `Welcome to ${teamName}! You can now start solving challenges.`,
+        });
         router.push('/challenges');
       } else {
         setError(result.message);
+        toast.error('Registration failed', {
+          description: result.message,
+        });
       }
     } catch (error) {
       setError('An error occurred during registration');
+      toast.error('Registration error', {
+        description: 'An unexpected error occurred. Please try again.',
+      });
     } finally {
       setIsLoading(false);
     }

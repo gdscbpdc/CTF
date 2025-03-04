@@ -27,10 +27,11 @@ import {
 import ReactMarkdown from 'react-markdown';
 import { useState, useCallback, useEffect } from 'react';
 import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
-
-import { submitFlag } from '@/lib/challenges';
-import { db } from '@/services/firebase.config';
 import { useAuth } from '@/contexts/AuthContext';
+import { submitFlag } from '@/lib/challenges';
+import { toast } from 'sonner';
+
+import { db } from '@/services/firebase.config';
 
 export default function ChallengeDetails({ challenge }) {
   const { user } = useAuth();
@@ -80,6 +81,10 @@ export default function ChallengeDetails({ challenge }) {
 
       if (!user?.id || !user?.team?.id) {
         setError('You must be logged in and part of a team to submit flags');
+        toast.error('Authentication required', {
+          description:
+            'You must be logged in and part of a team to submit flags',
+        });
         return;
       }
 
@@ -94,16 +99,32 @@ export default function ChallengeDetails({ challenge }) {
         setSuccess('Correct! Points awarded!');
         setFlag('');
         loadAttempts();
+        toast.success('Challenge completed!', {
+          description: `Congratulations! You've earned ${challenge.points} points!`,
+        });
       } else {
         setError(result.message);
+        toast.error('Incorrect flag', {
+          description: result.message,
+        });
       }
     } catch (error) {
       console.error('Error submitting flag:', error);
       setError('Error submitting flag. Please try again.');
+      toast.error('Submission error', {
+        description: 'Failed to submit flag. Please try again.',
+      });
     } finally {
       setIsSubmitting(false);
     }
-  }, [challenge.id, flag, user?.id, user?.team?.id, loadAttempts]);
+  }, [
+    challenge.id,
+    flag,
+    user?.id,
+    user?.team?.id,
+    loadAttempts,
+    challenge.points,
+  ]);
 
   const handleKeyPress = useCallback(
     (e) => {

@@ -1,5 +1,4 @@
 export const CHALLENGE_CATEGORIES = [
-  'Fundamentals',
   'Web',
   'Cryptography',
   'Forensics',
@@ -10,7 +9,6 @@ export const CHALLENGE_CATEGORIES = [
 ];
 
 export const CHALLENGE_CATEGORIES_COLORS = {
-  Fundamentals: 'info',
   Web: 'primary',
   Cryptography: 'secondary',
   Forensics: 'success',
@@ -19,9 +17,15 @@ export const CHALLENGE_CATEGORIES_COLORS = {
   PWN: 'danger',
 };
 
-export const CHALLENGE_DIFFICULTIES = ['Easy', 'Medium', 'Hard'];
+export const CHALLENGE_DIFFICULTIES = [
+  'Fundamentals',
+  'Easy',
+  'Medium',
+  'Hard',
+];
 
 export const CHALLENGE_DIFFICULTIES_COLORS = {
+  Fundamentals: 'info',
   Easy: 'success',
   Medium: 'warning',
   Hard: 'danger',
