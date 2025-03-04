@@ -1,8 +1,8 @@
 export const CHALLENGE_CATEGORIES = [
   'Web',
-  'Crypto',
+  'Cryptography',
   'Forensics',
-  'Reversing',
+  'Reverse Engineering',
   'Misc',
   'Prompt Engieering',
   'PWN',
@@ -10,9 +10,9 @@ export const CHALLENGE_CATEGORIES = [
 
 export const CHALLENGE_CATEGORIES_COLORS = {
   Web: 'primary',
-  Crypto: 'secondary',
+  Cryptography: 'secondary',
   Forensics: 'success',
-  Reversing: 'danger',
+  'Reverse Engineering': 'danger',
   Misc: 'default',
   PWN: 'danger',
 };

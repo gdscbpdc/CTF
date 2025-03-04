@@ -139,10 +139,10 @@ export default function Header() {
         </NavbarItem> */}
 
         {isAdminPage ? (
-          pathname === '/admin/login' ? (
+          pathname.includes('/admin') ? (
             <NavbarItem>
               <Button as={Link} href='/' color='primary'>
-                CTF Home
+                Home
               </Button>
             </NavbarItem>
           ) : (
