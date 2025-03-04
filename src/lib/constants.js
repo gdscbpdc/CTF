@@ -24,7 +24,7 @@ export const CHALLENGE_DIFFICULTIES = [
 ];
 
 export const CHALLENGE_DIFFICULTIES_COLORS = {
-  Fundamentals: 'info',
+  Fundamentals: 'secondary',
   Easy: 'success',
   Medium: 'warning',
   Hard: 'danger',

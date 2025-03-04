@@ -161,12 +161,7 @@ export default function ChallengesPage() {
           );
         case 'category':
           return (
-            <Chip
-              className='capitalize'
-              color='default'
-              size='sm'
-              variant='flat'
-            >
+            <Chip className='capitalize' size='sm' variant='flat'>
               {cellValue}
             </Chip>
           );

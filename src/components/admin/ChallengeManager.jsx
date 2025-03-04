@@ -51,7 +51,11 @@ import {
 import { toast } from 'sonner';
 
 import { db, storage } from '@/services/firebase.config';
-import { CHALLENGE_CATEGORIES, CHALLENGE_DIFFICULTIES } from '@/lib/constants';
+import {
+  CHALLENGE_CATEGORIES,
+  CHALLENGE_DIFFICULTIES,
+  CHALLENGE_DIFFICULTIES_COLORS,
+} from '@/lib/constants';
 
 const emptyChallenge = {
   title: '',
@@ -340,11 +344,7 @@ export default function ChallengeManager() {
               <TableCell>
                 <Chip
                   color={
-                    challenge.difficulty === 'Easy'
-                      ? 'success'
-                      : challenge.difficulty === 'Medium'
-                      ? 'warning'
-                      : 'danger'
+                    CHALLENGE_DIFFICULTIES_COLORS[challenge.difficulty] || ''
                   }
                   variant='flat'
                 >
