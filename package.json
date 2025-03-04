@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@nextui-org/react": "^2.6.11",
-    "@uploadthing/react": "^7.3.0",
     "firebase": "^10.14.1",
     "framer-motion": "^11.18.2",
     "js-cookie": "^3.0.5",
@@ -22,9 +21,7 @@
     "react-markdown": "^9.1.0",
     "react-youtube": "^10.1.0",
     "recharts": "^2.15.1",
-    "sonner": "^2.0.1",
-    "sooner": "^1.1.4",
-    "uploadthing": "^7.5.2"
+    "sonner": "^2.0.1"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.20",

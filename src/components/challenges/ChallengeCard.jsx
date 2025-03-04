@@ -10,7 +10,7 @@ import {
 
 export default function ChallengeCard({ challenge }) {
   return (
-    <Link href={`/challenges/${challenge.id}`}>
+    <Link prefetch shallow href={`/challenges/${challenge.id}`}>
       <Card
         isHoverable
         isPressable

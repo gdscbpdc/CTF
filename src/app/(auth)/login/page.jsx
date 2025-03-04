@@ -151,6 +151,8 @@ export default function LoginPage() {
             <div className='text-center text-sm'>
               Don't have an account?{' '}
               <Link
+                prefetch
+                shallow
                 href='/register'
                 className='text-primary hover:underline font-medium'
               >

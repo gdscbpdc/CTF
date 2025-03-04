@@ -118,6 +118,7 @@ export default function Header() {
               >
                 <Link
                   prefetch
+                  shallow
                   className={`flex items-center gap-2 ${
                     pathname === item.href
                       ? 'text-primary'
@@ -171,21 +172,25 @@ export default function Header() {
               </DropdownTrigger>
               <DropdownMenu aria-label='Profile Actions' variant='flat'>
                 <DropdownItem
+                  as={Link}
+                  href='/profile'
+                  prefetch
+                  shallow
                   key='profile'
                   startContent={<User className='w-4 h-4' />}
                 >
-                  <Link href='/profile' prefetch>
-                    Profile
-                  </Link>
+                  Profile
                 </DropdownItem>
                 {isAdminLoggedIn && (
                   <DropdownItem
+                    as={Link}
+                    href='/admin'
+                    prefetch
+                    shallow
                     key='admin'
                     startContent={<Shield className='w-4 h-4' />}
                   >
-                    <Link href='/admin' prefetch>
-                      Admin Panel
-                    </Link>
+                    Admin Panel
                   </DropdownItem>
                 )}
                 <DropdownItem
@@ -229,6 +234,7 @@ export default function Header() {
               <NavbarMenuItem key={item.href}>
                 <Link
                   prefetch
+                  shallow
                   className={`flex items-center gap-2 w-full ${
                     pathname === item.href
                       ? 'text-primary'

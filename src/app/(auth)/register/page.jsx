@@ -274,6 +274,8 @@ export default function RegisterPage() {
             <div className='text-center text-sm'>
               Already have an account?{' '}
               <Link
+                prefetch
+                shallow
                 href='/login'
                 className='text-primary hover:underline font-medium'
               >

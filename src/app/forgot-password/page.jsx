@@ -96,6 +96,8 @@ export default function ForgotPasswordPage() {
 
             <div className='text-center'>
               <Link
+                prefetch
+                shallow
                 href='/login'
                 className='text-primary hover:underline font-medium inline-flex items-center gap-2'
               >

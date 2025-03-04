@@ -303,19 +303,29 @@ export default function ChallengeDetails({ challenge }) {
           </CardHeader>
           <Divider />
           <CardBody>
-            <div className='space-y-2'>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               {challenge.attachments.map((attachment, index) => (
-                <a
+                <div
                   key={index}
-                  href={attachment.url}
-                  download={attachment.name}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='text-primary hover:underline flex items-center gap-2'
+                  className='flex items-center justify-between p-3 rounded-lg border border-default-200 hover:bg-default-100 transition-colors'
                 >
-                  <FileIcon className='w-4 h-4' />
-                  {attachment.name}
-                </a>
+                  <div className='flex items-center gap-3 flex-1 min-w-0'>
+                    <FileIcon className='w-5 h-5 text-primary flex-shrink-0' />
+                    <span className='truncate text-default-700'>
+                      {attachment.name}
+                    </span>
+                  </div>
+                  <Button
+                    as='a'
+                    download={attachment.name}
+                    variant='flat'
+                    size='sm'
+                    className='flex-shrink-0 ml-4'
+                    startContent={<FileDown className='w-4 h-4' />}
+                  >
+                    Download
+                  </Button>
+                </div>
               ))}
             </div>
           </CardBody>

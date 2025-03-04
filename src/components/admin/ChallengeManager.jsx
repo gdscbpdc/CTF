@@ -19,6 +19,7 @@ import {
   Select,
   SelectItem,
   Textarea,
+  Divider,
 } from '@nextui-org/react';
 import {
   collection,
@@ -31,11 +32,25 @@ import {
   addDoc,
 } from 'firebase/firestore';
 import { useState, useEffect } from 'react';
-import { ref, deleteObject } from 'firebase/storage';
-import { Search, Plus, Pencil, Trash2, Eye, Upload } from 'lucide-react';
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from 'firebase/storage';
+import {
+  Search,
+  Plus,
+  Pencil,
+  Trash2,
+  Eye,
+  Upload,
+  FileDown,
+  X,
+} from 'lucide-react';
+import { toast } from 'sonner';
 
 import { db, storage } from '@/services/firebase.config';
-import { useUploadThing } from '@/lib/hooks/useUploadThing';
 import { CHALLENGE_CATEGORIES, CHALLENGE_DIFFICULTIES } from '@/lib/constants';
 
 const emptyChallenge = {
@@ -65,8 +80,6 @@ export default function ChallengeManager() {
   const [files, setFiles] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState('');
-
-  const { startUpload } = useUploadThing('challengeAttachment');
 
   useEffect(() => {
     loadChallenges();
@@ -158,15 +171,22 @@ export default function ChallengeManager() {
             await deleteObject(storageRef);
           } catch (error) {
             console.error('Error deleting file:', error);
+            toast.error('Error deleting file', {
+              description: `Failed to delete ${attachment.name}`,
+            });
           }
         }
       }
 
       await deleteDoc(doc(db, 'challenges', challengeId));
+      toast.success('Challenge deleted successfully');
       await loadChallenges();
     } catch (error) {
       console.error('Error deleting challenge:', error);
       setError('Failed to delete challenge');
+      toast.error('Failed to delete challenge', {
+        description: error.message,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -183,20 +203,34 @@ export default function ChallengeManager() {
     setFiles((prev) => [...prev, ...newFiles]);
   };
 
-  const uploadFiles = async () => {
+  const uploadFiles = async (files, challengeTitle) => {
     if (!files.length) return [];
 
     try {
-      const uploadedFiles = await startUpload(files);
-      if (!uploadedFiles) {
-        throw new Error('Failed to upload files');
+      const uploadedFiles = [];
+
+      for (const file of files) {
+        const storageRef = ref(
+          storage,
+          `challenges/${challengeTitle}/${file.name}`
+        );
+
+        await uploadBytes(storageRef, file);
+
+        const downloadURL = await getDownloadURL(storageRef);
+
+        uploadedFiles.push({
+          name: file.name,
+          url: downloadURL,
+        });
       }
-      return uploadedFiles.map((file) => ({
-        name: file.name,
-        url: file.ufsUrl,
-      }));
+
+      return uploadedFiles;
     } catch (error) {
       console.error('Error uploading files:', error);
+      toast.error('Failed to upload files', {
+        description: error.message,
+      });
       throw new Error('Failed to upload files');
     }
   };
@@ -207,10 +241,17 @@ export default function ChallengeManager() {
       setError('');
       setIsUploading(true);
 
+      if (!formData.title) {
+        toast.error('Missing title', {
+          description: 'Please provide a title for the challenge',
+        });
+        return;
+      }
+
       let attachments = formData.attachments || [];
 
       if (files.length > 0) {
-        const uploadedFiles = await uploadFiles();
+        const uploadedFiles = await uploadFiles(files, formData.title);
         attachments = [...attachments, ...uploadedFiles];
       }
 
@@ -227,11 +268,13 @@ export default function ChallengeManager() {
           doc(db, 'challenges', selectedChallenge.id),
           challengeData
         );
+        toast.success('Challenge updated successfully');
       } else {
         await addDoc(collection(db, 'challenges'), {
           ...challengeData,
           createdAt: new Date().toISOString(),
         });
+        toast.success('Challenge created successfully');
       }
 
       await loadChallenges();
@@ -240,6 +283,9 @@ export default function ChallengeManager() {
     } catch (error) {
       console.error('Error saving challenge:', error);
       setError('Failed to save challenge');
+      toast.error('Failed to save challenge', {
+        description: error.message,
+      });
     } finally {
       setIsLoading(false);
       setIsUploading(false);
@@ -474,80 +520,130 @@ export default function ChallengeManager() {
                     minRows={2}
                     placeholder='https://example.com'
                   />
-                  <div>
-                    <p className='text-small text-default-500 mb-2'>
-                      Current Attachments
-                    </p>
-                    {formData.attachments?.length ? (
-                      <div className='space-y-2'>
-                        {formData.attachments.map((attachment, index) => (
-                          <div
-                            key={index}
-                            className='flex items-center justify-between'
-                          >
-                            <span>{attachment.name}</span>
-                            <Button
-                              size='sm'
-                              color='danger'
-                              variant='light'
-                              isIconOnly
-                              onPress={() =>
-                                setFormData({
-                                  ...formData,
-                                  attachments: formData.attachments.filter(
-                                    (_, i) => i !== index
-                                  ),
-                                })
-                              }
-                            >
-                              <Trash2 className='w-4 h-4' />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className='text-default-400'>No attachments</p>
-                    )}
-                  </div>
-                  <div>
-                    <p className='text-small text-default-500 mb-2'>
-                      Add Attachments
-                    </p>
-                    <input
-                      type='file'
-                      multiple
-                      onChange={handleFileChange}
-                      className='hidden'
-                      id='file-upload'
-                      accept='.pdf,.txt,.zip,.jpg,.jpeg,.png,.gif'
-                    />
-                    <label htmlFor='file-upload'>
-                      <Button
-                        as='span'
-                        color='default'
-                        variant='flat'
-                        startContent={<Upload className='w-4 h-4' />}
-                      >
-                        Choose Files
-                      </Button>
-                    </label>
-                    {files.length > 0 && (
-                      <div className='mt-2'>
-                        <p className='text-small text-default-500 mb-2'>
-                          Selected files:
-                        </p>
+                  <div className='space-y-4'>
+                    <div>
+                      <p className='text-small font-medium mb-2'>
+                        Current Attachments
+                      </p>
+                      {formData.attachments?.length ? (
                         <div className='space-y-2'>
-                          {files.map((file, index) => (
+                          {formData.attachments.map((attachment, index) => (
                             <div
                               key={index}
-                              className='p-2 bg-default-100 rounded-md'
+                              className='flex items-center justify-between p-3 rounded-lg border border-default-200 bg-default-50'
                             >
-                              {file.name}
+                              <div className='flex items-center gap-3 flex-1 min-w-0'>
+                                <FileDown className='w-4 h-4 text-primary flex-shrink-0' />
+                                <span className='truncate text-default-700'>
+                                  {attachment.name}
+                                </span>
+                              </div>
+                              <div className='flex gap-2 flex-shrink-0'>
+                                <Button
+                                  as='a'
+                                  href={attachment.url}
+                                  target='_blank'
+                                  rel='noopener noreferrer'
+                                  size='sm'
+                                  variant='flat'
+                                  isIconOnly
+                                >
+                                  <Eye className='w-4 h-4' />
+                                </Button>
+                                <Button
+                                  size='sm'
+                                  color='danger'
+                                  variant='flat'
+                                  isIconOnly
+                                  onPress={() =>
+                                    setFormData({
+                                      ...formData,
+                                      attachments: formData.attachments.filter(
+                                        (_, i) => i !== index
+                                      ),
+                                    })
+                                  }
+                                >
+                                  <Trash2 className='w-4 h-4' />
+                                </Button>
+                              </div>
                             </div>
                           ))}
                         </div>
+                      ) : (
+                        <div className='text-default-400 text-center p-4 rounded-lg border border-dashed border-default-200'>
+                          No attachments added yet
+                        </div>
+                      )}
+                    </div>
+
+                    <Divider />
+
+                    <div>
+                      <p className='text-small font-medium mb-2'>
+                        Add New Attachments
+                      </p>
+                      <div className='space-y-4'>
+                        <div className='flex flex-col items-center justify-center p-6 rounded-lg border-2 border-dashed border-default-200'>
+                          <input
+                            type='file'
+                            multiple
+                            onChange={handleFileChange}
+                            className='hidden'
+                            id='file-upload'
+                            accept='.pdf,.txt,.zip,.jpg,.jpeg,.png,.gif'
+                          />
+                          <label
+                            htmlFor='file-upload'
+                            className='cursor-pointer'
+                          >
+                            <div className='flex flex-col items-center gap-2'>
+                              <Upload className='w-8 h-8 text-default-400' />
+                              <div className='text-center'>
+                                <p className='text-default-700 font-medium'>
+                                  Click to upload files
+                                </p>
+                                <p className='text-small text-default-400'>
+                                  PDF, TXT, ZIP, JPG, PNG, GIF up to 10MB
+                                </p>
+                              </div>
+                            </div>
+                          </label>
+                        </div>
+
+                        {files.length > 0 && (
+                          <div className='space-y-2'>
+                            <p className='text-small font-medium'>
+                              Selected files to upload:
+                            </p>
+                            {files.map((file, index) => (
+                              <div
+                                key={index}
+                                className='flex items-center justify-between p-2 rounded-lg bg-default-100'
+                              >
+                                <div className='flex items-center gap-2 flex-1 min-w-0'>
+                                  <FileDown className='w-4 h-4 text-primary' />
+                                  <span className='truncate'>{file.name}</span>
+                                </div>
+                                <Button
+                                  size='sm'
+                                  isIconOnly
+                                  variant='light'
+                                  color='danger'
+                                  onPress={() => {
+                                    setFiles(
+                                      files.filter((_, i) => i !== index)
+                                    );
+                                  }}
+                                >
+                                  <X className='w-4 h-4' />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                    )}
+                    </div>
                   </div>
                 </div>
               </ModalBody>
