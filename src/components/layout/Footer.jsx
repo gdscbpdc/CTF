@@ -7,6 +7,7 @@ export default function Footer() {
       <Divider />
       <footer className='py-6 md:py-12 container mx-auto px-4 grid place-items-center'>
         <Image
+          priority
           src='/on_campus.png'
           alt='Logo'
           width={600}

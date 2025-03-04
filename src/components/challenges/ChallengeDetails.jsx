@@ -144,8 +144,6 @@ export default function ChallengeDetails({ challenge }) {
     }));
   };
 
-  console.log(challenge);
-
   return (
     <div className='max-w-4xl mx-auto space-y-6'>
       <Card className='bg-gradient-to-r from-primary-500/10 to-secondary-500/10 border-none'>
@@ -317,7 +315,10 @@ export default function ChallengeDetails({ challenge }) {
                   </div>
                   <Button
                     as='a'
+                    href={attachment.url}
                     download={attachment.name}
+                    target='_blank'
+                    rel='noopener noreferrer'
                     variant='flat'
                     size='sm'
                     className='flex-shrink-0 ml-4'

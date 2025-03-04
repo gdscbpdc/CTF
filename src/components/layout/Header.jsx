@@ -82,6 +82,7 @@ export default function Header() {
       <NavbarContent className='sm:hidden pr-3' justify='start'>
         <NavbarBrand>
           <Image
+            priority
             src='/logo.png'
             alt='GDG CTF Logo'
             width={100}
@@ -95,6 +96,7 @@ export default function Header() {
       <NavbarContent className='hidden sm:flex' justify='start'>
         <NavbarBrand>
           <Image
+            priority
             src='/logo.png'
             alt='GDG CTF Logo'
             width={100}
