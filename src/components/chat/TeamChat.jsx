@@ -18,7 +18,6 @@ import {
   collection,
   query,
   orderBy,
-  limit,
   addDoc,
   onSnapshot,
   serverTimestamp,
@@ -38,8 +37,7 @@ export default function TeamChat() {
     const q = query(
       collection(db, 'chats'),
       where('teamId', '==', user.team.id),
-      orderBy('timestamp', 'desc'),
-      limit(50)
+      orderBy('timestamp', 'desc')
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
