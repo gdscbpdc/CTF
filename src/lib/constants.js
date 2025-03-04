@@ -1,4 +1,5 @@
 export const CHALLENGE_CATEGORIES = [
+  'Fundamentals',
   'Web',
   'Cryptography',
   'Forensics',
@@ -9,6 +10,7 @@ export const CHALLENGE_CATEGORIES = [
 ];
 
 export const CHALLENGE_CATEGORIES_COLORS = {
+  Fundamentals: 'info',
   Web: 'primary',
   Cryptography: 'secondary',
   Forensics: 'success',
