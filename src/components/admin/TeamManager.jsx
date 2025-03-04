@@ -209,12 +209,7 @@ export default function TeamManager() {
           {(team) => (
             <TableRow key={team.id}>
               <TableCell>
-                <div className='flex items-center gap-2'>
-                  {team.rank === 1 && (
-                    <Trophy className='w-4 h-4 text-warning' />
-                  )}
-                  {team.teamName}
-                </div>
+                <div className='flex items-center gap-2'>{team.teamName}</div>
               </TableCell>
               <TableCell>
                 <div className='flex flex-wrap gap-2'>
@@ -250,8 +245,6 @@ export default function TeamManager() {
               <ModalHeader className='flex flex-row items-center gap-2'>
                 <h2 className='text-xl font-bold'>{selectedTeam.teamName}</h2>
 
-                <Chip color='primary'>{selectedTeam.rank}</Chip>
-
                 <Chip variant='flat'>{selectedTeam.points} pts</Chip>
               </ModalHeader>
               <ModalBody>
@@ -286,7 +279,7 @@ export default function TeamManager() {
                             {selectedTeam.solvedChallenges.length}
                           </p>
                         </div>
-                        <div className='space-y-2'>
+                        <div className='space-y-2 max-h-[200px] overflow-y-auto'>
                           {selectedTeam.solvedChallenges.map((challengeId) => (
                             <div
                               key={challengeId}

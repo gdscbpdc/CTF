@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Card, CardHeader, CardBody, Avatar, Button } from '@nextui-org/react';
-import { getTopTeams } from '@/lib/leaderboard';
 import LoadingState from '@/components/ui/LoadingState';
 import ErrorState from '@/components/ui/ErrorState';
 import { db } from '@/services/firebase.config';
@@ -120,7 +119,6 @@ export default function LeaderboardPreview() {
         {teams.map((team) => (
           <div key={team.id} className='flex justify-between items-center py-2'>
             <div className='flex items-center gap-3'>
-              <span className='font-bold text-default-500'>#{team.rank}</span>
               <Avatar name={team.teamName} size='sm' />
               <span className='font-medium'>{team.teamName}</span>
             </div>

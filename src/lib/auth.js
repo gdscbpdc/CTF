@@ -14,7 +14,6 @@ import {
   getDocs,
   writeBatch,
 } from 'firebase/firestore';
-import { getUserRank } from './ranks';
 import Cookies from 'js-cookie';
 
 export async function getCurrentUser() {
@@ -85,7 +84,6 @@ export async function registerTeam(teamData) {
       teamName,
       points: 0,
       solvedChallenges: [],
-      rank: getUserRank(0),
       createdAt: new Date().toISOString(),
       memberCount: members.length,
     };

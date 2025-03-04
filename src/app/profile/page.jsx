@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import {
   Card,
   CardBody,
@@ -12,11 +11,6 @@ import {
   Divider,
   Progress,
 } from '@nextui-org/react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
-import { getUserProfile, getUserStats, updateUserProfile } from '@/lib/profile';
-import LoadingState from '@/components/ui/LoadingState';
-import ErrorState from '@/components/ui/ErrorState';
 import {
   Trophy,
   Flag,
@@ -27,6 +21,13 @@ import {
   User,
   Lock,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+
+import { useAuth } from '@/contexts/AuthContext';
+import ErrorState from '@/components/ui/ErrorState';
+import LoadingState from '@/components/ui/LoadingState';
+import { getUserProfile, getUserStats, updateUserProfile } from '@/lib/profile';
 
 export default function ProfilePage() {
   const router = useRouter();

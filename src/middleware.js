@@ -67,12 +67,12 @@ export async function middleware(request) {
     }
 
     if (hasEventStarted()) {
-      if (!isPublicRoute) {
-        return NextResponse.redirect(new URL('/countdown', request.url));
-      }
-    } else {
       if (isPublicRoute) {
         return NextResponse.redirect(new URL('/challenges', request.url));
+      }
+    } else {
+      if (pathname.includes('/challenges')) {
+        return NextResponse.redirect(new URL('/countdown', request.url));
       }
     }
   }

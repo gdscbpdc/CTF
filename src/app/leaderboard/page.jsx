@@ -17,8 +17,8 @@ import { useState, useEffect, useCallback } from 'react';
 
 import { getLeaderboard } from '@/lib/leaderboard';
 import ErrorState from '@/components/ui/ErrorState';
-import LoadingState from '@/components/ui/LoadingState';
 import Podium from '@/components/leaderboard/podium';
+import LoadingState from '@/components/ui/LoadingState';
 import CountdownTimer from '@/components/leaderboard/CountdownTimer';
 
 export default function LeaderboardPage() {
@@ -81,7 +81,6 @@ export default function LeaderboardPage() {
           <Table aria-label='Leaderboard'>
             <TableHeader>
               <TableColumn>POSITION</TableColumn>
-              <TableColumn>RANK</TableColumn>
               <TableColumn>TEAM</TableColumn>
               <TableColumn>POINTS</TableColumn>
               <TableColumn>SOLVES</TableColumn>
@@ -100,7 +99,6 @@ export default function LeaderboardPage() {
                       `#${index + 1}`
                     )}
                   </TableCell>
-                  <TableCell>{team.rank}</TableCell>
                   <TableCell>{team.teamName}</TableCell>
                   <TableCell>{team.points}</TableCell>
                   <TableCell>{team.solvedChallenges?.length || 0}</TableCell>
