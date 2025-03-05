@@ -17,13 +17,14 @@ import {
 import { Trophy } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { getLeaderboard } from '@/lib/leaderboard';
 import ErrorState from '@/components/ui/ErrorState';
 import Podium from '@/components/leaderboard/podium';
 import LoadingState from '@/components/ui/LoadingState';
 import CountdownTimer from '@/components/leaderboard/CountdownTimer';
-import Link from 'next/link';
+import { isEventEnded } from '@/lib/constants';
 
 export default function LeaderboardPage() {
   const [leaderboard, setLeaderboard] = useState(null);
@@ -57,6 +58,19 @@ export default function LeaderboardPage() {
 
   return (
     <div className='space-y-6'>
+      {isEventEnded() && (
+        <Card className='bg-success-500/10 border-success'>
+          <CardBody className='py-4'>
+            <div className='flex items-center justify-center gap-2'>
+              <Trophy className='w-6 h-6 text-success' />
+              <p className='text-success text-lg font-semibold'>
+                The CTF event has ended. These are the final results!
+              </p>
+            </div>
+          </CardBody>
+        </Card>
+      )}
+
       <CountdownTimer />
 
       <div className='grid grid-cols-3 gap-6'>

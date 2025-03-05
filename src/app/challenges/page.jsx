@@ -17,6 +17,8 @@ import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { collection, query, onSnapshot } from 'firebase/firestore';
+import { isEventEnded } from '@/lib/constants';
+import ErrorState from '@/components/ui/ErrorState';
 
 import {
   CHALLENGE_CATEGORIES,
@@ -50,6 +52,12 @@ export default function ChallengesPage() {
     column: 'title',
     direction: 'ascending',
   });
+
+  useEffect(() => {
+    if (isEventEnded()) {
+      router.push('/');
+    }
+  }, [router]);
 
   useEffect(() => {
     const unsubscribe = subscribeToChanges();
@@ -311,6 +319,15 @@ export default function ChallengesPage() {
       </div>
     );
   }, [page, pages]);
+
+  if (isEventEnded()) {
+    return (
+      <ErrorState
+        message='The CTF event has ended. Challenges are no longer accessible.'
+        description='Thank you for participating! Check the leaderboard for final results.'
+      />
+    );
+  }
 
   if (isLoading)
     return <LoadingState message='Loading challenges...' fullHeight />;

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardBody } from '@nextui-org/react';
+import { EVENT_END_TIME, isEventEnded } from '@/lib/constants';
 
 export default function CountdownTimer() {
   const [timeLeft, setTimeLeft] = useState({
@@ -14,7 +15,7 @@ export default function CountdownTimer() {
 
   useEffect(() => {
     const startTime = new Date('2025-03-05T07:30:00Z');
-    const endTime = new Date('2025-03-05T13:30:00Z');
+    const endTime = EVENT_END_TIME;
 
     const updateTimer = () => {
       const now = new Date();
@@ -59,6 +60,11 @@ export default function CountdownTimer() {
     const seconds = Math.floor((diff % (1000 * 60)) / 1000);
     return { hours, minutes, seconds };
   };
+
+  // Hide the timer if event has ended
+  if (isEventEnded()) {
+    return null;
+  }
 
   const getColorClasses = () => {
     const colorMap = {
