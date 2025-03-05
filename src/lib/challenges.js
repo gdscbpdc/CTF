@@ -21,7 +21,6 @@ export async function getAllChallenges() {
     const snapshot = await getDocs(q);
     return snapshot.docs.map((doc) => {
       const data = doc.data();
-      // Remove sensitive flag data before sending to client
       const { flag, ...challengeData } = data;
       return {
         id: doc.id,
@@ -41,7 +40,6 @@ export async function getChallengeById(challengeId) {
       return null;
     }
     const data = challengeDoc.data();
-    // Remove sensitive flag data before sending to client
     const { flag, ...challengeData } = data;
     return {
       id: challengeId,
