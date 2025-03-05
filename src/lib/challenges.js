@@ -18,34 +18,38 @@ export async function getAllChallenges() {
   try {
     const challengesRef = collection(db, 'challenges');
     const q = query(challengesRef, orderBy('title'));
-    const querySnapshot = await getDocs(q);
-
-    return querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map((doc) => {
+      const data = doc.data();
+      // Remove sensitive flag data before sending to client
+      const { flag, ...challengeData } = data;
+      return {
+        id: doc.id,
+        ...challengeData,
+      };
+    });
   } catch (error) {
-    console.error('Error getting challenges:', error);
-    throw error;
+    console.error('Error getting all challenges:', error);
+    return [];
   }
 }
 
-export async function getChallengeById(id) {
+export async function getChallengeById(challengeId) {
   try {
-    const challengeDoc = await getDoc(doc(db, 'challenges', id));
-
+    const challengeDoc = await getDoc(doc(db, 'challenges', challengeId));
     if (!challengeDoc.exists()) {
       return null;
     }
-
-    const challengeData = {
-      id: challengeDoc.id,
-      ...challengeDoc.data(),
+    const data = challengeDoc.data();
+    // Remove sensitive flag data before sending to client
+    const { flag, ...challengeData } = data;
+    return {
+      id: challengeId,
+      ...challengeData,
     };
-    return challengeData;
   } catch (error) {
-    console.error('Error getting challenge:', error);
-    throw error;
+    console.error('Error getting challenge by ID:', error);
+    return null;
   }
 }
 

@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import {
   Table,
   TableHeader,
@@ -20,17 +19,18 @@ import {
   Select,
   SelectItem,
 } from '@nextui-org/react';
-import { Search, Eye, Ban, CheckCircle, Trophy } from 'lucide-react';
-import { db } from '@/services/firebase.config';
 import {
   collection,
   query,
   getDocs,
-  doc,
-  updateDoc,
   where,
   onSnapshot,
+  orderBy,
 } from 'firebase/firestore';
+import { Search, Eye } from 'lucide-react';
+import { useState, useEffect } from 'react';
+
+import { db } from '@/services/firebase.config';
 
 const SORT_OPTIONS = [
   {
@@ -78,6 +78,8 @@ export default function TeamManager() {
   const [sortOption, setSortOption] = useState('teamName-asc');
   const [isLoading, setIsLoading] = useState(true);
   const [selectedTeam, setSelectedTeam] = useState(null);
+  const [solveDetails, setSolveDetails] = useState([]);
+  const [isSolvesLoading, setIsSolvesLoading] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
@@ -129,6 +131,53 @@ export default function TeamManager() {
     }
   };
 
+  const fetchTeamSolves = async (teamId) => {
+    setIsSolvesLoading(true);
+    try {
+      const solvesQuery = query(
+        collection(db, 'solves'),
+        where('teamId', '==', teamId),
+        where('isCorrect', '==', true),
+        orderBy('timestamp', 'desc')
+      );
+      const solvesSnapshot = await getDocs(solvesQuery);
+      const solves = solvesSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+        timestamp: doc.data().timestamp?.toDate(),
+      }));
+
+      const challengeIds = solves.map((solve) => solve.challengeId);
+      let challengeMap = {};
+
+      if (challengeIds.length > 0) {
+        const challengesSnapshot = await getDocs(
+          query(
+            collection(db, 'challenges'),
+            where('__name__', 'in', challengeIds)
+          )
+        );
+        challengesSnapshot.docs.forEach((doc) => {
+          challengeMap[doc.id] = {
+            id: doc.id,
+            ...doc.data(),
+          };
+        });
+      }
+
+      const solveDetailsData = solves.map((solve) => ({
+        ...solve,
+        challenge: challengeMap[solve.challengeId],
+      }));
+
+      setSolveDetails(solveDetailsData);
+    } catch (error) {
+      console.error('Error fetching team solves:', error);
+    } finally {
+      setIsSolvesLoading(false);
+    }
+  };
+
   const filterAndSortTeams = () => {
     let filtered = [...teams];
 
@@ -160,7 +209,9 @@ export default function TeamManager() {
 
   const handleViewTeam = (team) => {
     setSelectedTeam(team);
+    setSolveDetails([]);
     onOpen();
+    fetchTeamSolves(team.id);
   };
 
   return (
@@ -243,16 +294,14 @@ export default function TeamManager() {
           {(onClose) => (
             <>
               <ModalHeader className='flex flex-row items-center gap-2'>
-                <h2 className='text-xl font-bold'>{selectedTeam.teamName}</h2>
-
-                <Chip variant='flat'>{selectedTeam.points} pts</Chip>
+                <h2 className='text-xl font-bold'>{selectedTeam?.teamName}</h2>
+                <Chip variant='flat'>{selectedTeam?.points} pts</Chip>
               </ModalHeader>
               <ModalBody>
                 {selectedTeam && (
                   <div className='space-y-6'>
                     <div className='space-y-2'>
                       <h3 className='text-lg font-semibold'>Members</h3>
-
                       <div className='space-y-2'>
                         {selectedTeam.members.map((member) => (
                           <div
@@ -274,20 +323,34 @@ export default function TeamManager() {
                           <h3 className='text-lg font-semibold'>
                             Solved Challenges
                           </h3>
-
                           <p className='text-default-500'>
                             {selectedTeam.solvedChallenges.length}
                           </p>
                         </div>
                         <div className='space-y-2 max-h-[200px] overflow-y-auto'>
-                          {selectedTeam.solvedChallenges.map((challengeId) => (
-                            <div
-                              key={challengeId}
-                              className='p-3 rounded-lg bg-default-100'
-                            >
-                              <p className='font-medium'>{challengeId}</p>
+                          {isSolvesLoading ? (
+                            <div className='flex justify-center items-center p-4'>
+                              <p className='text-default-500'>
+                                Loading solves...
+                              </p>
                             </div>
-                          ))}
+                          ) : (
+                            solveDetails.map((solve) => (
+                              <div
+                                key={solve.id}
+                                className='p-3 rounded-lg bg-default-100'
+                              >
+                                <div className='flex justify-between items-center'>
+                                  <p className='font-medium'>
+                                    {solve.challenge.title}
+                                  </p>
+                                  <p className='text-sm text-default-500'>
+                                    {solve.timestamp.toLocaleString()}
+                                  </p>
+                                </div>
+                              </div>
+                            ))
+                          )}
                         </div>
                       </div>
                     )}
