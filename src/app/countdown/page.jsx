@@ -6,7 +6,7 @@ import { Timer, Calendar, MapPin } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 
-const EVENT_START_TIME = '2025-03-05T11:00:00+04:00';
+const EVENT_START_TIME = '2025-03-05T11:30:00+04:00';
 
 export default function CountdownPage() {
   const router = useRouter();
@@ -63,7 +63,7 @@ export default function CountdownPage() {
             </div>
             <div className='flex items-center gap-2 text-primary'>
               <Timer className='w-5 h-5' />
-              <span>11:00 AM GMT+4</span>
+              <span>11:30 AM GMT+4</span>
             </div>
             <div className='flex items-center gap-2 text-primary'>
               <MapPin className='w-5 h-5' />

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const EVENT_START_TIME = '2025-03-05T11:00:00+04:00';
+const EVENT_START_TIME = '2025-03-05T11:30:00+04:00';
 
 const publicRoutes = [
   '/login',

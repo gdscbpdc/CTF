@@ -13,8 +13,8 @@ export default function CountdownTimer() {
   const [colorState, setColorState] = useState('secondary');
 
   useEffect(() => {
-    const startTime = new Date('2025-03-05T07:00:00Z');
-    const endTime = new Date('2025-03-05T13:00:00Z');
+    const startTime = new Date('2025-03-05T07:30:00Z');
+    const endTime = new Date('2025-03-05T13:30:00Z');
 
     const updateTimer = () => {
       const now = new Date();
