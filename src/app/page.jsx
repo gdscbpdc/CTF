@@ -93,9 +93,10 @@ export default function HomePage() {
                 Each challenge has a unique flag format. Submit the exact flag
                 to score points.
               </li>
+              <li>Points are awarded based on challenge difficulty.</li>
               <li>
-                Points are awarded based on challenge difficulty. Early solves
-                may receive bonus points.
+                Interactions with the source code of the CTF platform is
+                prohibited.
               </li>
               <li>
                 Attacking the competition infrastructure or other teams is
