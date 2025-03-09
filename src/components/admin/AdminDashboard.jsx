@@ -8,8 +8,17 @@ import {
   Divider,
   Tabs,
   Tab,
+  Button,
 } from '@nextui-org/react';
-import { Users, Flag, Trophy, Activity, BarChart3, Clock } from 'lucide-react';
+import {
+  Users,
+  Flag,
+  Trophy,
+  Activity,
+  BarChart3,
+  Clock,
+  Download,
+} from 'lucide-react';
 import { db } from '@/services/firebase.config';
 import {
   collection,
@@ -23,17 +32,25 @@ import {
   getDoc,
 } from 'firebase/firestore';
 import {
-  LineChart,
-  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  CartesianGrid,
+  Legend,
 } from 'recharts';
+import { toast } from 'sonner';
 import ChallengeManager from './ChallengeManager';
 import LoadingState from '@/components/ui/LoadingState';
 import ErrorState from '@/components/ui/ErrorState';
 import TeamManager from './TeamManager';
+import {
+  exportTeamsToCSV,
+  downloadCSV,
+  exportDetailedSolvesToCSV,
+} from '@/lib/export';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
@@ -42,6 +59,7 @@ export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isActivityLoading, setIsActivityLoading] = useState(true);
+  const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
     loadDashboardData();
@@ -64,21 +82,44 @@ export default function AdminDashboard() {
       const challengesSnapshot = await getDocs(collection(db, 'challenges'));
       const totalChallenges = challengesSnapshot.size;
 
-      const solvesSnapshot = await getDocs(collection(db, 'solves'));
+      const solvesQuery = query(
+        collection(db, 'solves'),
+        where('isCorrect', '==', true)
+      );
+      const solvesSnapshot = await getDocs(solvesQuery);
+
       const totalSolves = solvesSnapshot.size;
 
-      const solves = [];
+      const teamSolveStats = [];
+      const teamSolvesMap = {};
+
       solvesSnapshot.forEach((doc) => {
         const solve = doc.data();
-        const date = new Date(solve.timestamp.toDate()).toLocaleDateString();
-        const existingDate = solves.find((s) => s.date === date);
-        if (existingDate) {
-          existingDate.solves++;
-        } else {
-          solves.push({ date, solves: 1 });
+        const teamId = solve.teamId;
+
+        if (!teamSolvesMap[teamId]) {
+          teamSolvesMap[teamId] = 0;
         }
+
+        teamSolvesMap[teamId]++;
       });
-      setSolveStats(solves.sort((a, b) => new Date(a.date) - new Date(b.date)));
+
+      for (const teamDoc of teamsSnapshot.docs) {
+        const teamId = teamDoc.id;
+        const teamData = teamDoc.data();
+
+        if (teamSolvesMap[teamId]) {
+          teamSolveStats.push({
+            name: teamData.teamName,
+            solves: teamSolvesMap[teamId],
+            points: teamData.points || 0,
+          });
+        }
+      }
+
+      teamSolveStats.sort((a, b) => b.solves - a.solves);
+
+      setSolveStats(teamSolveStats.slice(0, 10));
 
       setStats({
         totalTeams,
@@ -130,12 +171,156 @@ export default function AdminDashboard() {
     });
   };
 
+  const handleExportTeams = async () => {
+    try {
+      setIsExporting(true);
+      toast.info('Preparing team data for export...', {
+        id: 'export-toast',
+        duration: 10000,
+      });
+
+      const teamsSnapshot = await getDocs(collection(db, 'teams'));
+      const teamsData = [];
+      const teamIds = [];
+
+      toast.loading('Fetching team and member data...', {
+        id: 'export-toast',
+      });
+
+      for (const document of teamsSnapshot.docs) {
+        const team = document.data();
+        teamIds.push(document.id);
+
+        console.log(team);
+
+        const membersQuery = query(
+          collection(db, 'users'),
+          where('teamId', '==', document.id)
+        );
+        const membersSnapshot = await getDocs(membersQuery);
+        const members = membersSnapshot.docs.map((memberDoc) => ({
+          id: memberDoc.id,
+          ...memberDoc.data(),
+        }));
+
+        teamsData.push({
+          id: document.id,
+          ...team,
+          members,
+          memberCount: members.length,
+        });
+      }
+
+      toast.loading('Fetching challenge data...', {
+        id: 'export-toast',
+      });
+
+      const challengesSnapshot = await getDocs(collection(db, 'challenges'));
+      const challengesMap = {};
+      challengesSnapshot.docs.forEach((doc) => {
+        console.log(doc.data());
+
+        challengesMap[doc.id] = {
+          id: doc.id,
+          ...doc.data(),
+        };
+      });
+
+      toast.loading('Fetching solve data...', {
+        id: 'export-toast',
+      });
+
+      const solvesQuery = query(
+        collection(db, 'solves'),
+        where('isCorrect', '==', true)
+      );
+      const solvesSnapshot = await getDocs(solvesQuery);
+      const solveDetails = {};
+
+      for (const solve of solvesSnapshot.docs) {
+        const solveData = solve.data();
+        const teamId = solveData.teamId;
+
+        console.log(teamId);
+
+        if (!teamIds.includes(teamId)) continue;
+
+        const challenge = challengesMap[solveData.challengeId];
+        if (!challenge) continue;
+
+        let solvedBy = 'Unknown';
+        if (solveData.userId) {
+          const userDoc = await getDoc(doc(db, 'users', solveData.userId));
+          if (userDoc.exists()) {
+            solvedBy = userDoc.data().name || userDoc.data().email || 'Unknown';
+          }
+        }
+
+        if (!solveDetails[teamId]) {
+          solveDetails[teamId] = [];
+        }
+
+        solveDetails[teamId].push({
+          id: solve.id,
+          challengeId: solveData.challengeId,
+          challengeTitle: challenge.title,
+          challengeCategory: challenge.category,
+          points: challenge.points,
+          timestamp: solveData.timestamp?.toDate(),
+          solvedBy,
+        });
+      }
+
+      toast.loading('Generating CSV files...', {
+        id: 'export-toast',
+      });
+
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+
+      const csvContent = exportTeamsToCSV(teamsData, solveDetails);
+      downloadCSV(csvContent, `teams-export-${timestamp}.csv`);
+
+      const detailedCsvContent = exportDetailedSolvesToCSV(
+        teamsData,
+        solveDetails
+      );
+      downloadCSV(detailedCsvContent, `teams-solves-detailed-${timestamp}.csv`);
+
+      toast.success('Team data exported successfully!', {
+        id: 'export-toast',
+        description:
+          'Two files have been downloaded: teams summary and detailed solves. All times are in Dubai time (UTC+4).',
+      });
+    } catch (error) {
+      console.error('Error exporting teams:', error);
+      toast.error('Failed to export team data', {
+        id: 'export-toast',
+        description: error.message,
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   if (isLoading)
     return <LoadingState message='Loading dashboard...' fullHeight />;
   if (error) return <ErrorState message={error} onRetry={loadDashboardData} />;
 
   return (
     <div className='space-y-6'>
+      <div className='flex justify-between items-center'>
+        <h1 className='text-2xl font-bold'>Admin Dashboard</h1>
+        <Button
+          color='primary'
+          startContent={<Download className='w-4 h-4' />}
+          isLoading={isExporting}
+          onPress={handleExportTeams}
+          tooltip='Export team data with correct solves as CSV files (summary and detailed solves)'
+        >
+          Export Teams & Solves
+        </Button>
+      </div>
+
       <div className='grid grid-cols-1 md:grid-cols-4 gap-6'>
         <Card>
           <CardBody className='flex flex-row items-center gap-4'>
@@ -182,19 +367,36 @@ export default function AdminDashboard() {
         <CardHeader className='flex gap-3'>
           <BarChart3 className='w-6 h-6' />
           <div className='flex flex-col'>
-            <p className='text-md'>Solve Statistics</p>
+            <p className='text-md'>Team Performance</p>
             <p className='text-small text-default-500'>
-              Number of solves per day
+              Solves and points per team (top 10)
             </p>
           </div>
         </CardHeader>
         <Divider />
         <CardBody>
-          <div className='h-[300px]'>
+          <div className='h-[400px]'>
             <ResponsiveContainer width='100%' height='100%'>
-              <LineChart data={solveStats}>
-                <XAxis dataKey='date' />
-                <YAxis />
+              <BarChart
+                data={solveStats}
+                margin={{
+                  top: 20,
+                  right: 30,
+                  left: 20,
+                  bottom: 70,
+                }}
+              >
+                <CartesianGrid strokeDasharray='3 3' />
+                <XAxis
+                  dataKey='name'
+                  angle={-45}
+                  textAnchor='end'
+                  height={80}
+                  interval={0}
+                  tick={{ fontSize: 12 }}
+                />
+                <YAxis yAxisId='left' orientation='left' stroke='#8884d8' />
+                <YAxis yAxisId='right' orientation='right' stroke='#82ca9d' />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: 'var(--background)',
@@ -204,13 +406,20 @@ export default function AdminDashboard() {
                   labelStyle={{ color: 'var(--foreground)' }}
                   itemStyle={{ color: 'var(--foreground)' }}
                 />
-                <Line
-                  type='monotone'
+                <Legend />
+                <Bar
+                  yAxisId='left'
                   dataKey='solves'
-                  stroke='var(--red-color)'
-                  strokeWidth={2}
+                  name='Solves'
+                  fill='#8884d8'
                 />
-              </LineChart>
+                <Bar
+                  yAxisId='right'
+                  dataKey='points'
+                  name='Points'
+                  fill='#82ca9d'
+                />
+              </BarChart>
             </ResponsiveContainer>
           </div>
         </CardBody>

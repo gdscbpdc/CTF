@@ -61,7 +61,6 @@ export default function CountdownTimer() {
     return { hours, minutes, seconds };
   };
 
-  // Hide the timer if event has ended
   if (isEventEnded()) {
     return null;
   }
